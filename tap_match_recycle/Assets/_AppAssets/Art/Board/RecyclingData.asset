@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53d2bf629395452e91efa9e1057a593c, type: 3}
+  m_Name: RecyclingData
+  m_EditorClassIdentifier: 
+  RecyclingTypeData:
+  - RecyclingTypeColor: {r: 0.3647059, g: 0.27450982, b: 0.18431373, a: 1}
+    RecyclingType: 0
+  - RecyclingTypeColor: {r: 1, g: 0.96657693, b: 0, a: 1}
+    RecyclingType: 1
+  - RecyclingTypeColor: {r: 0.04601282, g: 0.28976873, b: 0.8867924, a: 1}
+    RecyclingType: 2
+  - RecyclingTypeColor: {r: 0, g: 0.6603774, b: 0.04893539, a: 1}
+    RecyclingType: 3
+  - RecyclingTypeColor: {r: 1, g: 0, b: 0, a: 1}
+    RecyclingType: 4
+  - RecyclingTypeColor: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 1}
+    RecyclingType: 5

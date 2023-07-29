@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &34610044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1092,13 +1092,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91139f5918d34114b2fc3812dced2f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boardWidth: 6
+  _boardWidth: 5
   _boardHeight: 5
   _matchablePrefab: {fileID: 9148878639189856495, guid: d048fceda87874f1982e365a019f5260, type: 3}
   _mainCamera: {fileID: 519420031}
   _boardMarginPercentage: 0.025
   _boardScreenHeightPercantage: 0.7
-  HeightText: {fileID: 1159173616}
 --- !u!4 &1233914103
 Transform:
   m_ObjectHideFlags: 0
