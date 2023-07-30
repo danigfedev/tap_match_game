@@ -3,12 +3,7 @@ using UnityEngine;
 
 namespace _AppAssets.Code
 {
-    public interface ITest
-    {
-        
-    }
-    
-    public class MonoBehaviourPool <TPoolable> : MonoBehaviour, ITest where TPoolable : MonoBehaviour, IPoolable
+    public class MonoBehaviourPool <TPoolable> : MonoBehaviour where TPoolable : MonoBehaviour, IPoolable
     {
         public TPoolable _poolableItem;
         protected int _poolSize;
@@ -100,14 +95,6 @@ namespace _AppAssets.Code
 
         protected void ResetPool()
         {
-            // foreach (var activeObject in _activeObjects)
-            // {
-            //     //Each of these serves
-            //     ResetAndReturnItemToPool(activeObject);
-            //     // activeObject.ResetAndSendToPool();
-            // }
-            
-            //Option 1:
             var activeItems = _activeObjects.Count;
             for(int i = activeItems-1; i>=0; i--)
             {

@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 namespace _AppAssets.Code.Input
 {
     public class InputFactory
