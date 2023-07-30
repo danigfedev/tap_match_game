@@ -1,19 +1,15 @@
+using System;
 using _AppAssets.Code.Utilities;
 using UnityEngine;
 using UnityInput = UnityEngine.Input;
 
 namespace _AppAssets.Code.Input
 {
-    public abstract class InputManager<T>
+    public abstract class InputManager<T> where T : MonoBehaviour, IPoolable
     {
-        public abstract bool HandleInput<T>(out T objectHit);
-        
-        protected bool _inputBlocked;
+        public event Action<T> OnItemTapped;
 
-        public void ToggleInputBlocked(bool blocked)
-        {
-            _inputBlocked = blocked;
-        }
+        protected bool _inputBlocked;
 
         protected Camera _mainCamera;
 
@@ -21,41 +17,47 @@ namespace _AppAssets.Code.Input
         {
             _mainCamera = Camera.main;
         }
+        
+        public abstract void HandleInput();
+        
+        public void ToggleInputBlocked(bool blocked)
+        {
+            _inputBlocked = blocked;
+        }
+
+        protected void RaiseOnItemTappedEvent(T item)
+        {
+            OnItemTapped?.Invoke(item);
+        }
     }
+    
     
     public class EditorInputManager<T> : InputManager<T> where T : MonoBehaviour, IPoolable
     {
-        public override bool HandleInput<T>(out T objectHit)
+        public override void HandleInput()
         {
-            objectHit = default;
-
             if (_inputBlocked)
             {
-                return false;
+                return;
             }
             
             if (UnityEngine.Input.GetMouseButtonUp(0))
             {
                 if (_mainCamera.RayCastToScreenPosition<T>(UnityInput.mousePosition, out T hitObject))
                 {
-                    objectHit = hitObject;
-                    return true;
+                    RaiseOnItemTappedEvent(hitObject);
                 }
             }
-
-            return false;
         }
     }
 
     public class MobileInputManager<T> : InputManager<T> where T : MonoBehaviour, IPoolable
     {
-        public override bool HandleInput<T>(out T objectHit)
+        public override void HandleInput()
         {
-            objectHit = default;
-            
             if (_inputBlocked)
             {
-                return false;
+                return;
             }
             
             if (UnityInput.touches.Length > 0)
@@ -68,13 +70,10 @@ namespace _AppAssets.Code.Input
                     
                     if (_mainCamera.RayCastToScreenPosition<T>(inputPos, out T hitObject))
                     {
-                        objectHit = hitObject;
-                        return true;
+                        RaiseOnItemTappedEvent(hitObject);
                     }
                 }
             }
-
-            return false;
         }
     }
 }

@@ -33,6 +33,7 @@ namespace _AppAssets.Code
         private void Start()
         {
             _inputManager = InputFactory.CreateInputManager<Matchable>(Application.platform);
+            _inputManager.OnItemTapped += OnItemTapped;
             
             //Initialize Object Pools
             BoardManager.InitializeBoard(_boardWidth, _boardHeight, _mainCamera, _boardScreenHeightPercantage);
@@ -42,12 +43,14 @@ namespace _AppAssets.Code
 
         private void Update()
         {
-            if (_inputManager.HandleInput(out Matchable output))
-            {
-                var message = "Object hit: " + output.Type;
-                _debugText.text = message;
-                Debug.Log(message);
-            }
+            _inputManager.HandleInput();
+        }
+
+        private void OnItemTapped(Matchable tappedItem)
+        {
+            var message = "Object hit: " + tappedItem.Type;
+            _debugText.text = message;
+            Debug.Log(message);
         }
 
         [ContextMenu("Reset Board")]
