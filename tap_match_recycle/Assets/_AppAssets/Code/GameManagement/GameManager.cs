@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
+using _AppAssets.Code.Input;
 using UnityEngine;
 
 namespace _AppAssets.Code
 {
     public class GameManager : MonoBehaviour
     {
+        [SerializeField] private TMPro.TextMeshProUGUI _debugText;
+            
         [Header("Game rules")]
         [Range(5, 20)]
         [SerializeField] private int _boardWidth;
@@ -24,12 +28,26 @@ namespace _AppAssets.Code
         
         public BoardManager BoardManager;
 
+        private InputManager<Matchable> _inputManager;
+
         private void Start()
         {
+            _inputManager = InputFactory.CreateInputManager<Matchable>(Application.platform);
+            
             //Initialize Object Pools
             BoardManager.InitializeBoard(_boardWidth, _boardHeight, _mainCamera, _boardScreenHeightPercantage);
 
             StartCoroutine(SetupGame());
+        }
+
+        private void Update()
+        {
+            if (_inputManager.HandleInput(out Matchable output))
+            {
+                var message = "Object hit: " + output.Type;
+                _debugText.text = message;
+                Debug.Log(message);
+            }
         }
 
         [ContextMenu("Reset Board")]
@@ -50,16 +68,6 @@ namespace _AppAssets.Code
         {
             Screen.orientation = ScreenOrientation.Portrait;
         }
-        
-        // private void ClearBoard()
-        // {
-        //     var tileCount = _board.transform.childCount;
-        //
-        //     for (int i = tileCount - 1; i >= 0; i--)
-        //     {
-        //         Destroy(_board.transform.GetChild(i).gameObject);
-        //     }
-        // }
 
         private IEnumerator SetupGame()
         {
@@ -69,10 +77,7 @@ namespace _AppAssets.Code
             
             ConfigureCameraOrtographicSize();
 
-            // GetBoardAreaCenter();
-            
             BoardManager.BuildGameBoard(_boardWidth, _boardHeight);
-            // var boardCenter = BuildGameBoard();
         }
 
         private IEnumerator ConfigureScreenOrientation()

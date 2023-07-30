@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace _AppAssets.Code
 {
@@ -10,7 +11,9 @@ namespace _AppAssets.Code
         //Node
         
         public event Action<IPoolable> OnSendToPool;
-        
+
+        public RecyclingTypes Type => Data.RecyclingType;
+
         public void Initialize(MatchableData data)
         {
             Data = data;
@@ -29,7 +32,5 @@ namespace _AppAssets.Code
             Reset();
             OnSendToPool?.Invoke(this);
         }
-
-        
     }
 }
