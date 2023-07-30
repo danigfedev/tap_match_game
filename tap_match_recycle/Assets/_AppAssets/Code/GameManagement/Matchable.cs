@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -16,6 +18,7 @@ namespace _AppAssets.Code
         public event Action<IPoolable> OnSendToPool;
 
         public RecyclingTypes Type => _data.RecyclingType;
+        public BoardCoordinates Coordinates => _boardNode.Coordinates;
 
         public void SetMatchableData(MatchableData data, BoardNode boardNode)
         {
@@ -26,6 +29,12 @@ namespace _AppAssets.Code
         public void MarkAsMatched()
         {
             IsMatched = true;
+        }
+
+        public List<Matchable> GetAdjacentMatchables()
+        {
+            var adjacentNodes = _boardNode.GetAdjacentNodes();
+            return adjacentNodes.Select(node => node.Matchable).ToList();
         }
         
         public void InitializePoolable(Transform parent)

@@ -1,6 +1,7 @@
 using System.Collections;
 using _AppAssets.Code.Input;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _AppAssets.Code
 {
@@ -10,7 +11,7 @@ namespace _AppAssets.Code
         [SerializeField] private GameSettingsProvider _gameSettingsProvider;
         [SerializeField] private Camera _mainCamera;
 
-        public BoardManager BoardManager;
+        [SerializeField] private BoardManager _boardManager;
 
         private DisplayManager _displayManager;
         private InputManager<Matchable> _inputManager;
@@ -23,7 +24,7 @@ namespace _AppAssets.Code
             _displayManager = new DisplayManager();
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
             
-            BoardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager);
+            _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager);
             
             //IDEA: Here the State Machine should start
             
@@ -37,6 +38,8 @@ namespace _AppAssets.Code
 
         private void OnItemTapped(Matchable tappedItem)
         {
+            _boardManager.FindMatchesAndUpdateBoard(tappedItem);
+            
             var message = "Object hit: " + tappedItem.Type;
             _debugText.text = message;
             Debug.Log(message);
@@ -45,7 +48,7 @@ namespace _AppAssets.Code
         [ContextMenu("Reset Board")]
         public void ResetBoard()
         {
-            BoardManager.ClearBoard();
+            _boardManager.ClearBoard();
             StartCoroutine(SetupGame());
         }
         
@@ -69,7 +72,7 @@ namespace _AppAssets.Code
             
             _displayManager.ConfigureCameraOrtographicSize();
 
-            BoardManager.BuildGameBoard();
+            _boardManager.BuildGameBoard();
         }
     }
 }

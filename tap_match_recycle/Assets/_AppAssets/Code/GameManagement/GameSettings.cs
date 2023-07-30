@@ -11,5 +11,6 @@ namespace _AppAssets.Code
         public int BoardHeight = 5;
         [Range(3, 6)] 
         public int NumberOfMatchables = 3;
+        public BoardCoordinates BoardDimensions => new BoardCoordinates(BoardWidth, BoardHeight);
     }
 }

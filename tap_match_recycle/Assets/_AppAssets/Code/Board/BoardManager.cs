@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace _AppAssets.Code
@@ -53,7 +55,7 @@ namespace _AppAssets.Code
             var boardHeight = _gameSettings.BoardHeight;
             
             _boardNodes = new BoardNode[boardWidth, boardHeight];
-            
+
             var randomMatchableData = _matchablesProvider.GetRandomMatchables(boardWidth * boardHeight, _gameSettings.NumberOfMatchables);
             
             var counter = 0;
@@ -67,7 +69,7 @@ namespace _AppAssets.Code
                         
                     matchableInstance = GetItemFromPool();
 
-                    var boardNode = new BoardNode(boardCoordinates, matchableInstance);
+                    var boardNode = new BoardNode(boardCoordinates, matchableInstance, _boardNodes);
                     _boardNodes[column, row] = boardNode;
 
                     matchableInstance.SetMatchableData(randomMatchableData[counter], boardNode);
@@ -82,5 +84,40 @@ namespace _AppAssets.Code
         {
             return _gameSettings.BoardWidth * _gameSettings.BoardHeight * 2;
         }
+
+        public void FindMatchesAndUpdateBoard(Matchable tappedMatchable)
+        {
+            var matches = new List<Matchable>();
+            FindMatches(tappedMatchable, tappedMatchable.Type, ref matches);
+            // tappedMatchable.Type
+        }
+
+        private void FindMatches(Matchable tappedMatchable, RecyclingTypes typeToMatch, ref List<Matchable> matches)
+        {
+            if (tappedMatchable.Type != typeToMatch)
+            {
+                return;
+            }
+
+            if (tappedMatchable.IsMatched)
+            {
+                return;
+            }
+
+            matches.Add(tappedMatchable);
+            tappedMatchable.MarkAsMatched();
+            
+            var adjacentMatchables = tappedMatchable.GetAdjacentMatchables();
+            foreach (var adjacentMatchable in adjacentMatchables)
+            {
+                FindMatches(adjacentMatchable, typeToMatch, ref matches);
+            }
+        }
+
+        // private bool CheckIsInsideBoardBounds(BoardCoordinates coordinates)
+        // {
+        //     var boardWidth = _gameSettings.BoardWidth;
+        //     var boardHeight = _gameSettings.BoardHeight;
+        // }
     }
 }

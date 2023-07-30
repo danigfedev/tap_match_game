@@ -1095,7 +1095,7 @@ MonoBehaviour:
   _debugText: {fileID: 1159173616}
   _gameSettingsProvider: {fileID: 11400000, guid: d7b7626e452e84446b198ed273ee9e08, type: 2}
   _mainCamera: {fileID: 519420031}
-  BoardManager: {fileID: 1358346443}
+  _boardManager: {fileID: 1358346443}
 --- !u!4 &1233914103
 Transform:
   m_ObjectHideFlags: 0
