@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _AppAssets.Code
 {
-    [CreateAssetMenu(fileName = "RecyclingTypeProvider", menuName = "TapMatchRecycle/RecyclingTypeProvider")]
+    [CreateAssetMenu(fileName = "RecyclingTypeProvider", menuName = "TapMatchRecycle/Providers/RecyclingTypeProvider")]
     public class RecyclingTypeProvider : ScriptableObject
     {
         public RecyclingTypeData[] RecyclingTypeData;

@@ -40,7 +40,7 @@ namespace _AppAssets.Code
             for (int i = 0; i < diff; i++)
             {
                 var instance = Instantiate(_poolableItem, _poolParent);
-                instance.Reset();
+                instance.ResetPoolable();
                 _inactiveObjects.Add(instance);
             }
         }
@@ -80,7 +80,7 @@ namespace _AppAssets.Code
         protected void ReturnItemToPoolAndReset(IPoolable item)
         {
             ReturnItemToPool(item);
-            item.Reset();
+            item.ResetPoolable();
         }
 
         private void ReturnItemToPool(IPoolable item)
@@ -119,7 +119,7 @@ namespace _AppAssets.Code
             for (int i = 0; i < _poolSize; i++)
             {
                 var instance = Instantiate(_poolableItem, _poolParent);
-                instance.Reset();
+                instance.ResetPoolable();
                 _inactiveObjects.Add(instance);
             }
         }

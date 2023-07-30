@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _AppAssets.Code
 {
-    [CreateAssetMenu(fileName = "MatchablesProvider", menuName = "TapMatchRecycle/MatchablesProvider")]
+    [CreateAssetMenu(fileName = "MatchablesProvider", menuName = "TapMatchRecycle/Providers/MatchablesProvider")]
     public class MatchablesProvider : ScriptableObject
     {
         // public RecyclingTypeProvider RecyclingTypesPovider;
@@ -13,15 +13,18 @@ namespace _AppAssets.Code
 
         private System.Random _random;
         
-        public List<MatchableData> GetRandomMatchables(int N)
+        public List<MatchableData> GetRandomMatchables(int matchablesQuantity, int matchablesTypes)
         {
             var randomList = new List<MatchableData>();
             
             _random ??= new System.Random();
 
-            for (int i = 0; i < N; i++)
+            var maxRandomIndex = Mathf.Min(matchablesTypes, Matchables.Length);
+            
+            for (int i = 0; i < matchablesQuantity; i++)
             {
-                int randomIndex = _random.Next(0, Matchables.Length);
+                // int randomIndex = _random.Next(0, Matchables.Length);
+                int randomIndex = _random.Next(0, maxRandomIndex);
                 var randomElement = Matchables[randomIndex];
                 randomList.Add(randomElement);
             }

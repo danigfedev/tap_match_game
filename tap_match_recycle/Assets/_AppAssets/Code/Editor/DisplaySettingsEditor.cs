@@ -1,18 +1,19 @@
+using _AppAssets.Code.Settings;
 using UnityEditor;
 using UnityEngine;
 
 namespace _AppAssets.Code.Editor
 {
-    [CustomEditor(typeof(GameSettings))]
-    public class GameSettingsEditor : UnityEditor.Editor
+    [CustomEditor(typeof(DisplaySettings))]
+    public class DisplaySettingsEditor : UnityEditor.Editor
     {
         private int _uiRectangleTotalHeight = 400;
         private float _aspectRatio = (float) 9 / 16;
-        private GameSettings _settings;
+        private DisplaySettings _settings;
 
         public override void OnInspectorGUI()
         {
-            _settings = (GameSettings)target;
+            _settings = (DisplaySettings)target;
             DrawDefaultInspector();
             DrawSpace(10);
             DrawUIPreview();
@@ -30,8 +31,6 @@ namespace _AppAssets.Code.Editor
 
             float rectangleWidth = _uiRectangleTotalHeight * _aspectRatio;
             
-            // Rect previewRect = EditorGUILayout.GetControlRect(GUILayout.Height(20));
-            // DrawLabel(previewRect, "Preview", Color.black);
             DrawRectangleWithLabel(rectangleWidth, 15, Color.gray, "Preview");
             DrawSpace(2);
             DrawRectangleWithLabel(rectangleWidth, headerHeight, Color.red, $"Header: {headerHeightPercentage}");
@@ -55,12 +54,6 @@ namespace _AppAssets.Code.Editor
             labelStyle.normal.textColor = labelColor;
             labelStyle.fontStyle = FontStyle.Bold;
             labelStyle.alignment = TextAnchor.MiddleCenter;
-            
-            // Vector2 labelSize = labelStyle.CalcSize(new GUIContent(label));
-            // Rect labelRect = new Rect(rect.x + (rect.width - labelSize.x) / 2f, rect.y + (rect.height - labelSize.y) / 2f, labelSize.x, labelSize.y);
-            //
-            // GUI.Label(labelRect, label, labelStyle);
-            
             GUI.Label(rect, label, labelStyle);
         }
 

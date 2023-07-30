@@ -6,31 +6,52 @@ namespace _AppAssets.Code
 {
     public class Matchable : MonoBehaviour, IPoolable
     {
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        private MatchableData Data;
-        //Node
+        public bool IsMatched { get; private set; }
         
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+        
+        private MatchableData _data;
+        private BoardNode _boardNode;
+
         public event Action<IPoolable> OnSendToPool;
 
-        public RecyclingTypes Type => Data.RecyclingType;
+        public RecyclingTypes Type => _data.RecyclingType;
 
-        public void Initialize(MatchableData data)
+        public void SetMatchableData(MatchableData data, BoardNode boardNode)
         {
-            Data = data;
-            _spriteRenderer.sprite = Data.Sprite;
+            _data = data;
+            _boardNode = boardNode;
         }
 
-        public void Reset()
+        public void MarkAsMatched()
         {
-            Data = null;
+            IsMatched = true;
+        }
+        
+        public void InitializePoolable()
+        {
+            _spriteRenderer.sprite = _data.Sprite;
+        }
+
+        public void ResetPoolable()
+        {
+            ResetMatchableData();
+            
             transform.localPosition = Vector3.zero;
             gameObject.SetActive(false);
         }
 
         public void ResetAndSendToPool()
         {
-            Reset();
+            ResetPoolable();
             OnSendToPool?.Invoke(this);
+        }
+        
+        private void ResetMatchableData()
+        {
+            _data = null;
+            _boardNode = null;
+            IsMatched = false;
         }
     }
 }

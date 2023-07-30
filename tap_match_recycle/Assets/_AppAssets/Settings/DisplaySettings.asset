@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8e5c33550d6417c80e7646fc3dea5be, type: 3}
-  m_Name: GameSettings
+  m_Script: {fileID: 11500000, guid: e0ee6e1e76a84ddfa70c442cc510694c, type: 3}
+  m_Name: DisplaySettings
   m_EditorClassIdentifier: 
-  BoardWidth: 20
-  BoardHeight: 20
-  NumberOfMatchables: 6
+  BoardHeightScreenPercentage: 0.7
+  FooterToHeaderRatio: 2
+  BoardMarginPercentage: 0.025

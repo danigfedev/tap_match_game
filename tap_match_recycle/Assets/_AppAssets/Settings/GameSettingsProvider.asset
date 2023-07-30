@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8e5c33550d6417c80e7646fc3dea5be, type: 3}
-  m_Name: GameSettings
+  m_Script: {fileID: 11500000, guid: 56002c650ce249b1991ad7634be9fdba, type: 3}
+  m_Name: GameSettingsProvider
   m_EditorClassIdentifier: 
-  BoardWidth: 20
-  BoardHeight: 20
-  NumberOfMatchables: 6
+  GameSettings: {fileID: 11400000, guid: 14069e5daea9c47d5ac5bc34dafbd920, type: 2}
+  DisplaySettings: {fileID: 11400000, guid: 83e5d4c48682f430da5e6df5c01e194c, type: 2}
