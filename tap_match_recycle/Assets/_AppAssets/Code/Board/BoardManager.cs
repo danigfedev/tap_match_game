@@ -51,6 +51,7 @@ namespace _AppAssets.Code
         {
             var boardWidth = _gameSettings.BoardWidth;
             var boardHeight = _gameSettings.BoardHeight;
+            
             _boardNodes = new BoardNode[boardWidth, boardHeight];
             
             var randomMatchableData = _matchablesProvider.GetRandomMatchables(boardWidth * boardHeight, _gameSettings.NumberOfMatchables);
@@ -65,18 +66,12 @@ namespace _AppAssets.Code
                     var boardCoordinates = new BoardCoordinates(row, column);
                         
                     matchableInstance = GetItemFromPool();
-                    
-                    var matchableTransform = matchableInstance.transform;
-                    matchableTransform.parent = _board;
-                    matchableTransform.localPosition = Vector3.zero;
-                    matchableTransform.localPosition += (Vector3)(Vector2.right * column + Vector2.up * row);
 
                     var boardNode = new BoardNode(boardCoordinates, matchableInstance);
                     _boardNodes[column, row] = boardNode;
 
                     matchableInstance.SetMatchableData(randomMatchableData[counter], boardNode);
-                    
-                    matchableInstance.InitializePoolable();
+                    matchableInstance.InitializePoolable(_board);
                     
                     counter++;
                 }

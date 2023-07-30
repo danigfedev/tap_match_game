@@ -28,8 +28,13 @@ namespace _AppAssets.Code
             IsMatched = true;
         }
         
-        public void InitializePoolable()
+        public void InitializePoolable(Transform parent)
         {
+            transform.SetParent(parent);
+            transform.localPosition = Vector3.zero;
+            var coordinates = _boardNode.Coordinates;
+            transform.localPosition += (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
+            
             _spriteRenderer.sprite = _data.Sprite;
         }
 
