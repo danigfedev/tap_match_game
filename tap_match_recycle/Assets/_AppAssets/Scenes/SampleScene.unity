@@ -1092,12 +1092,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91139f5918d34114b2fc3812dced2f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boardWidth: 5
-  _boardHeight: 5
-  _matchablePrefab: {fileID: 9148878639189856495, guid: d048fceda87874f1982e365a019f5260, type: 3}
+  _boardWidth: 20
+  _boardHeight: 20
+  _numberOfMatchables: 0
+  _matchablePrefab: {fileID: 335564425048662207, guid: d048fceda87874f1982e365a019f5260, type: 3}
   _mainCamera: {fileID: 519420031}
   _boardMarginPercentage: 0.025
   _boardScreenHeightPercantage: 0.7
+  BoardManager: {fileID: 1358346443}
 --- !u!4 &1233914103
 Transform:
   m_ObjectHideFlags: 0
@@ -1189,6 +1191,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1266556330}
   m_CullTransparentMesh: 1
+--- !u!1 &1358346442
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1358346444}
+  - component: {fileID: 1358346443}
+  m_Layer: 0
+  m_Name: BoardManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1358346443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358346442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9f71ccb5d104fe3a3db50a16d150f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolableItem: {fileID: 335564425048662207, guid: d048fceda87874f1982e365a019f5260, type: 3}
+  _matchablesProvider: {fileID: 11400000, guid: f1534987ab8ec418e922c4a5a823b744, type: 2}
+--- !u!4 &1358346444
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1358346442}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1371520465
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,23 +5,29 @@ namespace _AppAssets.Code
 {
     public class GameManager : MonoBehaviour
     {
+        [Header("Game rules")]
         [Range(5, 20)]
         [SerializeField] private int _boardWidth;
         [Range(5, 20)]
         [SerializeField] private int _boardHeight;
-        [SerializeField] private GameObject _matchablePrefab;
+        [Range(3, 6)]
+        [SerializeField] private int _numberOfMatchables;
+        
+        [Space]
+        [SerializeField] private Matchable _matchablePrefab;
         [SerializeField] private Camera _mainCamera;
         
         [Range(0, 0.1f)]
         [SerializeField]private float _boardMarginPercentage = 0.025f;
 
         [SerializeField] private float _boardScreenHeightPercantage = 0.7f;
-
-        private GameObject _board;
+        
+        public BoardManager BoardManager;
 
         private void Start()
         {
-            _board = new GameObject("Board");
+            //Initialize Object Pools
+            BoardManager.InitializeBoard(_boardWidth, _boardHeight, _mainCamera, _boardScreenHeightPercantage);
 
             StartCoroutine(SetupGame());
         }
@@ -29,7 +35,7 @@ namespace _AppAssets.Code
         [ContextMenu("Reset Board")]
         public void ResetBoard()
         {
-            ClearBoard();
+            BoardManager.ClearBoard();
             StartCoroutine(SetupGame());
         }
         
@@ -45,15 +51,15 @@ namespace _AppAssets.Code
             Screen.orientation = ScreenOrientation.Portrait;
         }
         
-        private void ClearBoard()
-        {
-            var tileCount = _board.transform.childCount;
-
-            for (int i = tileCount - 1; i >= 0; i--)
-            {
-                Destroy(_board.transform.GetChild(i).gameObject);
-            }
-        }
+        // private void ClearBoard()
+        // {
+        //     var tileCount = _board.transform.childCount;
+        //
+        //     for (int i = tileCount - 1; i >= 0; i--)
+        //     {
+        //         Destroy(_board.transform.GetChild(i).gameObject);
+        //     }
+        // }
 
         private IEnumerator SetupGame()
         {
@@ -63,7 +69,10 @@ namespace _AppAssets.Code
             
             ConfigureCameraOrtographicSize();
 
-            var boardCenter = BuildGameBoard();
+            // GetBoardAreaCenter();
+            
+            BoardManager.BuildGameBoard(_boardWidth, _boardHeight);
+            // var boardCenter = BuildGameBoard();
         }
 
         private IEnumerator ConfigureScreenOrientation()
@@ -84,37 +93,6 @@ namespace _AppAssets.Code
             var verticalFit = _boardHeight * (1 + _boardMarginPercentage) / _boardScreenHeightPercantage;
             var cameraSizeDoubled = horizontalFit >= verticalFit ? horizontalFit : verticalFit;
             _mainCamera.orthographicSize = cameraSizeDoubled / 2;
-        }
-
-        private Vector2 BuildGameBoard()
-        {
-            var boardCenterPosition = GetBoardAreaCenter();
-
-            // Calculate Lower Left corner
-            var boardDimensions = new Vector2(_boardWidth / 2f - 0.5f, _boardHeight / 2f - 0.5f);
-            var lowerLeftCorner = boardCenterPosition - boardDimensions;
-            _board.transform.position = lowerLeftCorner;
-
-            GameObject matchableInstance;
-            for (int row = 0; row < _boardHeight; row++)
-            {
-                for (int column = 0; column < _boardWidth; column++)
-                {
-                    matchableInstance = Instantiate(_matchablePrefab, _board.transform);
-                    matchableInstance.transform.position += (Vector3)(Vector2.right * column + Vector2.up * row);
-                }
-            }
-
-            return new Vector2(_boardWidth / 2f - 0.5f, _boardHeight / 2f - 0.5f);
-        }
-        
-        private Vector2 GetBoardAreaCenter()
-        {
-            var screenHeight = Screen.height;
-            var centerHeight = screenHeight * 0.2f + screenHeight * _boardScreenHeightPercantage / 2;
-            var boardAreaCenter = new Vector2(Screen.width / 2f, centerHeight);
-            var boardCenterPosition = (Vector2)_mainCamera.ScreenToWorldPoint(boardAreaCenter);
-            return boardCenterPosition;
         }
     }
 }
