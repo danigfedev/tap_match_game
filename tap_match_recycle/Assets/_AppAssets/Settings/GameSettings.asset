@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8e5c33550d6417c80e7646fc3dea5be, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  BoardWidth: 5
-  BoardHeight: 5
+  BoardWidth: 10
+  BoardHeight: 10
   NumberOfMatchables: 6

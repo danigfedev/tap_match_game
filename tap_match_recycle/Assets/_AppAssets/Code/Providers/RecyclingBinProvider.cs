@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace _AppAssets.Code
@@ -6,15 +5,15 @@ namespace _AppAssets.Code
     [CreateAssetMenu(fileName = "RecyclingBinProvider", menuName = "TapMatchRecycle/Providers/RecyclingBinProvider")]
     public class RecyclingBinProvider : ScriptableObject
     {
-        public Sprite BinSprite;
+        public GameObject BinPrefab;
         public RecyclingTypeProvider RecyclingDataProvider;
 
-        public Sprite GetRecyclingBin(RecyclingTypes type) 
+        public GameObject GetRecyclingBin(RecyclingTypes type) 
         {
             var recyclingData = RecyclingDataProvider.GetRecyclingData(type);
-            var instance = Instantiate(BinSprite);
+            var instance = Instantiate(BinPrefab);
             instance.GetComponent<SpriteRenderer>().color *= recyclingData.RecyclingTypeColor;
-            return instance;
+            return BinPrefab;
         }
     }
 }
