@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -34,7 +35,7 @@ namespace _AppAssets.Code
 
         public void DetachFromBoard()
         {
-            //Trigger animation
+            //Trigger animation. Then Do:
             
             BoardNode.EmptyNode();
 
@@ -45,7 +46,8 @@ namespace _AppAssets.Code
         public void Update(BoardNode newNode)
         {
             SetBoardNodeData(newNode);
-            transform.localPosition = new Vector3(Coordinates.Column, Coordinates.Row, 0);
+            
+            transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
         }
 
         public List<Matchable> GetAdjacentMatchables()
