@@ -13,6 +13,11 @@ namespace _AppAssets.Code.Editor
             DrawDefaultInspector();
             
             EditorGUILayout.Space(10);
+
+            if (!EditorApplication.isPlaying)
+            {
+                return;
+            }
             
             if (GUILayout.Button("Reset Board"))
             {
