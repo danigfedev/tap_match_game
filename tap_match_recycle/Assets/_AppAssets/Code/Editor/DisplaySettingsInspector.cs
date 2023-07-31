@@ -5,7 +5,7 @@ using UnityEngine;
 namespace _AppAssets.Code.Editor
 {
     [CustomEditor(typeof(DisplaySettings))]
-    public class DisplaySettingsEditor : UnityEditor.Editor
+    public class DisplaySettingsInspector : UnityEditor.Editor
     {
         private int _uiRectangleTotalHeight = 400;
         private float _aspectRatio = (float) 9 / 16;
@@ -60,6 +60,6 @@ namespace _AppAssets.Code.Editor
         private void DrawSpace(int size)
         {
             EditorGUILayout.Space(size);
-        } 
+        }
     }
 }
