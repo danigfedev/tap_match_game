@@ -38,11 +38,11 @@ namespace _AppAssets.Code
 
         private void OnItemTapped(Matchable tappedItem)
         {
-            _boardManager.FindMatchesAndUpdateBoard(tappedItem);
-            
             var message = "Object hit: " + tappedItem.Type;
             _debugText.text = message;
-            Debug.Log(message);
+            // Debug.Log(message);
+            
+            _boardManager.FindMatchesAndUpdateBoard(tappedItem);
         }
 
         [ContextMenu("Reset Board")]

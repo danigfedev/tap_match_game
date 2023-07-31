@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   BoardWidth: 9
-  BoardHeight: 20
+  BoardHeight: 15
   NumberOfMatchables: 6

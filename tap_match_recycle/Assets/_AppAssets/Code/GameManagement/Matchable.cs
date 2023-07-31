@@ -8,22 +8,24 @@ namespace _AppAssets.Code
 {
     public class Matchable : MonoBehaviour, IPoolable
     {
-        public bool IsMatched { get; private set; }
-        
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        
-        private MatchableData _data;
-        private BoardNode _boardNode;
-
+        public event Action OnMatchableSentToBin; //Maybe this is the same as OnSendToPool? Will be called at the same point
         public event Action<IPoolable> OnSendToPool;
 
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+        
+        public BoardNode BoardNode { get; private set; }
+        public bool IsMatched { get; private set; }
         public RecyclingTypes Type => _data.RecyclingType;
-        public BoardCoordinates Coordinates => _boardNode.Coordinates;
+        // public BoardCoordinates Coordinates => BoardNode.Coordinates;
+        public BoardCoordinates Coordinates { get; private set; }
 
+        private MatchableData _data;
+        
         public void SetMatchableData(MatchableData data, BoardNode boardNode)
         {
             _data = data;
-            _boardNode = boardNode;
+            BoardNode = boardNode;
+            Coordinates = BoardNode.Coordinates; //New addition
         }
 
         public void MarkAsMatched()
@@ -31,9 +33,25 @@ namespace _AppAssets.Code
             IsMatched = true;
         }
 
+        public void DetachFromBoard()
+        {
+            //Trigger animation
+            
+            BoardNode.EmptyNode();
+
+            ResetAndSendToPool();//This should be called when reaches pool.
+            // _boardNode = null;
+        }
+
+        public void Update(BoardNode newNode)
+        {
+            BoardNode = newNode;
+            transform.localPosition = new Vector3(Coordinates.Column, Coordinates.Row, 0);
+        }
+
         public List<Matchable> GetAdjacentMatchables()
         {
-            var adjacentNodes = _boardNode.GetAdjacentNodes();
+            var adjacentNodes = BoardNode.GetAdjacentNodes();
             return adjacentNodes.Select(node => node.Matchable).ToList();
         }
         
@@ -41,7 +59,7 @@ namespace _AppAssets.Code
         {
             transform.SetParent(parent);
             transform.localPosition = Vector3.zero;
-            var coordinates = _boardNode.Coordinates;
+            var coordinates = BoardNode.Coordinates;
             transform.localPosition += (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
             
             _spriteRenderer.sprite = _data.Sprite;
@@ -64,7 +82,7 @@ namespace _AppAssets.Code
         private void ResetMatchableData()
         {
             _data = null;
-            _boardNode = null;
+            BoardNode = null;
             IsMatched = false;
         }
     }

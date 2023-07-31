@@ -7,6 +7,8 @@ namespace _AppAssets.Code
     {
         public BoardCoordinates Coordinates { get; private set; }
         public Matchable Matchable { get; private set; }
+
+        public bool IsEmpty => Matchable == null;
         
         private BoardNode[,] _boardNodes;
 
@@ -15,16 +17,26 @@ namespace _AppAssets.Code
             SetNodeData(coordinates, matchable, boardContext);
         }
         
-        public void SetMatchable(Matchable matchable)
-        {
-            Matchable = matchable;
-        }
-
         public void SetNodeData(BoardCoordinates coordinates, Matchable matchable, BoardNode[,] boardNodes)
         {
             Coordinates = coordinates;
             Matchable = matchable;
             _boardNodes = boardNodes;
+        }
+        
+        public void SetMatchable(Matchable matchable)
+        {
+            Matchable = matchable;
+        }
+
+        public void EmptyNode()
+        {
+            Matchable = null;
+        }
+
+        public void Update()
+        {
+            Matchable?.Update(this);
         }
 
         public List<BoardNode> GetAdjacentNodes()

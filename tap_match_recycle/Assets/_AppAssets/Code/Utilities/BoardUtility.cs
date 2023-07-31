@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace _AppAssets.Code.Utilities
 {
     public static class BoardUtility
@@ -9,6 +11,14 @@ namespace _AppAssets.Code.Utilities
             
             return coordinates.Row >= 0 && coordinates.Row < height && coordinates.Column >= 0 &&
                    coordinates.Column < width;
+        }
+
+        public static void DetachFromBoard(this List<Matchable> matches)
+        {
+            foreach (var matchable in matches)
+            {
+                matchable.DetachFromBoard();
+            }
         }
     }
 }
