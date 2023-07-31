@@ -24,8 +24,7 @@ namespace _AppAssets.Code
         public void SetMatchableData(MatchableData data, BoardNode boardNode)
         {
             _data = data;
-            BoardNode = boardNode;
-            Coordinates = BoardNode.Coordinates; //New addition
+            SetBoardNodeData(boardNode);
         }
 
         public void MarkAsMatched()
@@ -45,7 +44,7 @@ namespace _AppAssets.Code
 
         public void Update(BoardNode newNode)
         {
-            BoardNode = newNode;
+            SetBoardNodeData(newNode);
             transform.localPosition = new Vector3(Coordinates.Column, Coordinates.Row, 0);
         }
 
@@ -77,6 +76,12 @@ namespace _AppAssets.Code
         {
             ResetPoolable();
             OnSendToPool?.Invoke(this);
+        }
+
+        private void SetBoardNodeData(BoardNode node)
+        {
+            BoardNode = node;
+            Coordinates = BoardNode.Coordinates;
         }
         
         private void ResetMatchableData()

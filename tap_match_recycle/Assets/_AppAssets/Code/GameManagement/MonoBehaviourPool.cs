@@ -53,6 +53,7 @@ namespace _AppAssets.Code
             _activeObjects.Add(newItem);
             _inactiveObjects.RemoveAt(0);
             
+            newItem.OnSendToPool += ReturnItemToPool;
             newItem.gameObject.SetActive(true);
 
             return newItem;
@@ -66,9 +67,11 @@ namespace _AppAssets.Code
 
             for (int i = 0; i < amount; i++)
             {
-                var item = _inactiveObjects[i];
-                item.OnSendToPool += ReturnItemToPool;
-                newItems.Add(item);
+                var newItem = _inactiveObjects[i];
+                newItem.OnSendToPool += ReturnItemToPool;
+                newItem.gameObject.SetActive(true);
+                
+                newItems.Add(newItem);
             }
             
             _activeObjects.AddRange(newItems);
@@ -85,10 +88,10 @@ namespace _AppAssets.Code
 
         private void ReturnItemToPool(IPoolable item)
         {
-            var poolableItem = item as TPoolable;// ?????? Will this crash?
+            var poolableItem = item as TPoolable;
             _activeObjects.Remove(poolableItem); 
             _inactiveObjects.Add(poolableItem);
-            poolableItem.transform.parent = _poolParent;
+            poolableItem.transform.SetParent(_poolParent);
             
             item.OnSendToPool -= ReturnItemToPool;
         }
@@ -100,15 +103,6 @@ namespace _AppAssets.Code
             {
                 ReturnItemToPoolAndReset(_activeObjects[i]);
             }
-            
-            //Option 2:
-            // foreach (var activeItem in _activeObjects)
-            // {
-            //     activeItem.Reset();
-            //     activeItem.OnSendToPool -= ReturnItemToPool;
-            //     _inactiveObjects.Add(activeItem);
-            // }
-            // _activeObjects.Clear();
         }
 
         private void InitializePool()
