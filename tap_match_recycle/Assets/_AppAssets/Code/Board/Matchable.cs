@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using _AppAssets.Code.Settings;
 using DG.Tweening;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace _AppAssets.Code
         public event Action<IPoolable> OnSendToPool;
 
         [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private SortingLayerSettings _sortingLayerSettings;
         
         public BoardNode BoardNode { get; private set; }
         public bool IsMatched { get; private set; }
@@ -49,6 +51,7 @@ namespace _AppAssets.Code
         { 
             BoardNode.EmptyNode();
             
+            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableOverlay;
             transform.DOMove(_bin.position, 1).OnComplete(() =>
             {
                 ResetAndSendToPool();
@@ -68,13 +71,6 @@ namespace _AppAssets.Code
                                   (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
 
             InitializePoolableAtLocalPosition(parent, initialPosition);
-
-            // transform.SetParent(parent);
-            // transform.localPosition = Vector3.zero;
-            // var coordinates = BoardNode.Coordinates;
-            // transform.localPosition += (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
-            //
-            // _spriteRenderer.sprite = _data.Sprite;
         }
 
         public void InitializePoolableAtLocalPosition(Transform parent, Vector2 initialPosition)
@@ -85,6 +81,7 @@ namespace _AppAssets.Code
             transform.localPosition = initialPosition;
             
             _spriteRenderer.sprite = _data.Sprite;
+            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableDefault;
         }
 
         public void ResetPoolable()
@@ -92,6 +89,7 @@ namespace _AppAssets.Code
             ResetMatchableData();
             
             transform.localPosition = Vector3.zero;
+            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableDefault;
             gameObject.SetActive(false);
         }
 
