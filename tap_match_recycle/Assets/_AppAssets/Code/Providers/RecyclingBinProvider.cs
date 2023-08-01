@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace _AppAssets.Code
 {
@@ -7,13 +9,30 @@ namespace _AppAssets.Code
     {
         public GameObject BinPrefab;
         public RecyclingTypeProvider RecyclingDataProvider;
+        public int TotalBinCount => RecyclingDataProvider.RecyclingTypeData.Length;
+        
+        public Dictionary<RecyclingTypes,GameObject> InstantiateAllBins(Transform parent)
+        {
+            var binCount = TotalBinCount;
+            var recyclingTypeData = RecyclingDataProvider.RecyclingTypeData;
+            
+            var binDictionary = new Dictionary<RecyclingTypes, GameObject>(binCount);
+            
+            for(int i = 0; i < binCount; i++)
+            {
+                var binInstance = InstantiateBin(recyclingTypeData[i].RecyclingType, parent);
+                binDictionary.Add(recyclingTypeData[i].RecyclingType, binInstance);
+            }
 
-        public GameObject GetRecyclingBin(RecyclingTypes type) 
+            return binDictionary;
+        }
+        
+        public GameObject InstantiateBin(RecyclingTypes type, Transform parent) 
         {
             var recyclingData = RecyclingDataProvider.GetRecyclingData(type);
-            var instance = Instantiate(BinPrefab);
-            instance.GetComponent<SpriteRenderer>().color *= recyclingData.RecyclingTypeColor;
-            return BinPrefab;
+            var binInstance = Instantiate(BinPrefab, parent);
+            binInstance.GetComponent<Image>().color *= recyclingData.RecyclingTypeColor;
+            return binInstance;
         }
     }
 }

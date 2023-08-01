@@ -10,13 +10,15 @@ namespace _AppAssets.Code
         [SerializeField] private MatchablesProvider _matchablesProvider;
         private GameSettings _gameSettings;
         private DisplayManager _displayManager;
+        private RecyclingBinsManager _binsManager;
         private Transform _board;
         private BoardNode[,] _boardNodes;
 
-        public void Initialize(GameSettings gameSettings, DisplayManager displayManager)
+        public void Initialize(GameSettings gameSettings, DisplayManager displayManager, RecyclingBinsManager binsManager)
         {
             _gameSettings = gameSettings;
             _displayManager = displayManager;
+            _binsManager = binsManager;
 
             _poolSize = CalculatePoolSize();
 
@@ -73,7 +75,10 @@ namespace _AppAssets.Code
                     var boardNode = new BoardNode(boardCoordinates, matchableInstance, _boardNodes);
                     _boardNodes[column, row] = boardNode;
 
-                    matchableInstance.SetMatchableData(randomMatchableData[counter], boardNode);
+                    var matchableData = randomMatchableData[counter];
+                    var matchableBin = _binsManager.GetBinInstanceByType(matchableData.RecyclingType);
+                    
+                    matchableInstance.SetMatchableData(matchableData, boardNode, matchableBin.transform);
                     matchableInstance.InitializePoolable(_board);
                     
                     counter++;
@@ -117,8 +122,11 @@ namespace _AppAssets.Code
             {
                 matchableInstance = GetItemFromPool();
                 emptyNode.SetMatchable(matchableInstance);
+
+                var matchableData = randomMatchableData[counter];
+                var matchableBin = _binsManager.GetBinInstanceByType(matchableData.RecyclingType);
                 
-                matchableInstance.SetMatchableData(randomMatchableData[counter], emptyNode);
+                matchableInstance.SetMatchableData(matchableData, emptyNode, matchableBin.transform);
                 matchableInstance.InitializePoolable(_board);
                 counter++;
             }

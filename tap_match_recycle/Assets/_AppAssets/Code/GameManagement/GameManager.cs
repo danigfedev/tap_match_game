@@ -9,8 +9,7 @@ namespace _AppAssets.Code
     {
         [SerializeField] private TMPro.TextMeshProUGUI _debugText;
         [SerializeField] private GameSettingsProvider _gameSettingsProvider;
-        [SerializeField] private Camera _mainCamera;
-
+        [SerializeField] private RecyclingBinsManager _binsManager;
         [SerializeField] private BoardManager _boardManager;
 
         private DisplayManager _displayManager;
@@ -23,8 +22,8 @@ namespace _AppAssets.Code
 
             _displayManager = new DisplayManager();
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
-            
-            _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager);
+            _binsManager.Initialize();
+            _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
             
             //IDEA: Here the State Machine should start
             

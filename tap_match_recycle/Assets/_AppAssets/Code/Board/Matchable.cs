@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace _AppAssets.Code
 {
@@ -17,14 +16,15 @@ namespace _AppAssets.Code
         public BoardNode BoardNode { get; private set; }
         public bool IsMatched { get; private set; }
         public RecyclingTypes Type => _data.RecyclingType;
-        // public BoardCoordinates Coordinates => BoardNode.Coordinates;
         public BoardCoordinates Coordinates { get; private set; }
 
         private MatchableData _data;
+        private Transform _bin;
         
-        public void SetMatchableData(MatchableData data, BoardNode boardNode)
+        public void SetMatchableData(MatchableData data, BoardNode boardNode, Transform bin)
         {
             _data = data;
+            _bin = bin;
             SetBoardNodeData(boardNode);
         }
 
@@ -34,19 +34,18 @@ namespace _AppAssets.Code
         }
 
         public void DetachFromBoard()
-        {
-            //Trigger animation. Then Do:
-            
+        { 
             BoardNode.EmptyNode();
-
-            ResetAndSendToPool();//This should be called when reaches pool.
-            // _boardNode = null;
+            
+            transform.DOMove(_bin.position, 1).OnComplete(() =>
+            {
+                ResetAndSendToPool();
+            });
         }
 
         public void Update(BoardNode newNode)
         {
             SetBoardNodeData(newNode);
-            
             transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
         }
 
