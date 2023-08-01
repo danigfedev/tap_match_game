@@ -9,6 +9,9 @@ namespace _AppAssets.Code
         public Matchable Matchable { get; private set; }
 
         public bool IsEmpty => Matchable == null;
+
+        public int BoardWidth => _boardNodes.GetLength(0);
+        public int BoardHeight => _boardNodes.GetLength(1);
         
         private BoardNode[,] _boardNodes;
 

@@ -23,6 +23,16 @@ namespace _AppAssets.Code
         private MatchableData _data;
         private Transform _bin;
 
+        private void Update()
+        {
+            //TODO check matchable bounciness
+            //TODO Optimize this to only affect matchables from above
+            var heightDiff = transform.localPosition.y - (BoardNode.BoardHeight - 0.5f);
+            var color = _spriteRenderer.color;
+            color.a = 1 - heightDiff;
+            _spriteRenderer.color = color;
+        }
+        
         public void SetMatchableData(MatchableData data, Transform bin)
         {
             _data = data;
@@ -52,7 +62,7 @@ namespace _AppAssets.Code
             BoardNode.EmptyNode();
             
             _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableOverlay;
-            transform.DOMove(_bin.position, 1).OnComplete(() =>
+            transform.DOMove(_bin.position, 0.5f).OnComplete(() =>
             {
                 ResetAndSendToPool();
             });
