@@ -20,12 +20,24 @@ namespace _AppAssets.Code
 
         private MatchableData _data;
         private Transform _bin;
+
+        public void SetMatchableData(MatchableData data, Transform bin)
+        {
+            _data = data;
+            _bin = bin;
+        }
         
         public void SetMatchableData(MatchableData data, BoardNode boardNode, Transform bin)
         {
             _data = data;
             _bin = bin;
             SetBoardNodeData(boardNode);
+        }
+        
+        public void Update(BoardNode newNode)
+        {
+            SetBoardNodeData(newNode);
+            transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
         }
 
         public void MarkAsMatched()
@@ -43,12 +55,6 @@ namespace _AppAssets.Code
             });
         }
 
-        public void Update(BoardNode newNode)
-        {
-            SetBoardNodeData(newNode);
-            transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
-        }
-
         public List<Matchable> GetAdjacentMatchables()
         {
             var adjacentNodes = BoardNode.GetAdjacentNodes();
@@ -57,10 +63,26 @@ namespace _AppAssets.Code
         
         public void InitializePoolable(Transform parent)
         {
+            var coordinates = BoardNode.Coordinates;
+            var initialPosition = transform.localPosition +
+                                  (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
+
+            InitializePoolableAtLocalPosition(parent, initialPosition);
+
+            // transform.SetParent(parent);
+            // transform.localPosition = Vector3.zero;
+            // var coordinates = BoardNode.Coordinates;
+            // transform.localPosition += (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
+            //
+            // _spriteRenderer.sprite = _data.Sprite;
+        }
+
+        public void InitializePoolableAtLocalPosition(Transform parent, Vector2 initialPosition)
+        {
             transform.SetParent(parent);
             transform.localPosition = Vector3.zero;
-            var coordinates = BoardNode.Coordinates;
-            transform.localPosition += (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
+
+            transform.localPosition = initialPosition;
             
             _spriteRenderer.sprite = _data.Sprite;
         }

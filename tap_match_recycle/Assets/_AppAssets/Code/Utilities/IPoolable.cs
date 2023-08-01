@@ -7,6 +7,7 @@ namespace _AppAssets.Code
     {
         event Action<IPoolable> OnSendToPool;
         void InitializePoolable(Transform parent);
+        void InitializePoolableAtLocalPosition(Transform parent, Vector2 initialPosition);
         void ResetPoolable();
         void ResetAndSendToPool();
     }

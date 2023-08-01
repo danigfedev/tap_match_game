@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using _AppAssets.Code.Utilities;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace _AppAssets.Code
@@ -104,35 +105,15 @@ namespace _AppAssets.Code
             // 2 - Detach matches from board
             // 3 - Recalculate Board (update existing data)
             // 5 - Update nodes
-            // 4 - Get new items from pool
-            // 6 - Fill in spaces
-            
+
             matches.DetachFromBoard();
             
             //TODO Refactor this. Maybe thi can return the list of updated nodes
             UpdateBoard(groupedNodes);//Rename this to RecaulculateBoard or something like that
             
-            //Fill gaps ========
-            var emptyNodes=_boardNodes.Cast<BoardNode>().Where(node => node.IsEmpty);
-            var randomMatchableData = _matchablesProvider.GetRandomMatchables(matches.Count, _gameSettings.NumberOfMatchables);
-
-            Matchable matchableInstance;
-            int counter = 0;
-            foreach(var emptyNode in emptyNodes)
-            {
-                matchableInstance = GetItemFromPool();
-                emptyNode.SetMatchable(matchableInstance);
-
-                var matchableData = randomMatchableData[counter];
-                var matchableBin = _binsManager.GetBinInstanceByType(matchableData.RecyclingType);
-                
-                matchableInstance.SetMatchableData(matchableData, emptyNode, matchableBin.transform);
-                matchableInstance.InitializePoolable(_board);
-                counter++;
-            }
-            
+            //nodesToUpdate.Update();
         }
-        
+
         private void UpdateBoard(IEnumerable<IGrouping<int, BoardNode>> groupedMatches)
         {
             //Maybe do this insde a SelectMany method?
@@ -147,25 +128,40 @@ namespace _AppAssets.Code
                     boardNodesToUpdate.Add(_boardNodes[column, row]);
                 }
 
-                var firstNotMatchedNodeIndex = boardNodesToUpdate.FindIndex(node => !node.IsEmpty);
-                firstNotMatchedNodeIndex = Mathf.Max(0, firstNotMatchedNodeIndex);
+                //New implementation:
+                var matchablesForNodesToUpdate = new List<Matchable>();
+                var remainingMatchablesInBoard = boardNodesToUpdate.Where(n => !n.IsEmpty).Select(n => n.Matchable);
+                matchablesForNodesToUpdate.AddRange(remainingMatchablesInBoard);
 
-                var indicesToLoop = boardNodesToUpdate.Count - firstNotMatchedNodeIndex;
-
-                for (int index = 0; index < indicesToLoop; index++)
+                //Get new matchables from pool ==============================
+                var newNodesCount = boardNodesToUpdate.Count - matchablesForNodesToUpdate.Count;
+                var randomMatchableData = _matchablesProvider.GetRandomMatchables(newNodesCount, _gameSettings.NumberOfMatchables);
+                Matchable matchableInstance;
+                int auxCounter = 0;
+                for (int i = 0; i < newNodesCount; i++)
                 {
-                    var nodeToUpdate = boardNodesToUpdate[index];
-                    var newMatchable = boardNodesToUpdate[firstNotMatchedNodeIndex + index].Matchable;
-                    nodeToUpdate.SetMatchable(newMatchable);
+                    matchableInstance = GetItemFromPool();
+                    var matchableData = randomMatchableData[auxCounter];
+                    var matchableBin = _binsManager.GetBinInstanceByType(matchableData.RecyclingType);
+                    matchableInstance.SetMatchableData(matchableData, matchableBin.transform);
+
+                    //Setting matchable position at board's top
+                    var newMatchableVerticalPosition = _gameSettings.BoardHeight + auxCounter;
+                    var newMatachableHorizontalPosition = column;
+                    // var newMatachableHorizontalPosition = nodeToUpdate.Coordinates.Column;
+                    var newPosition = new Vector2(newMatachableHorizontalPosition, newMatchableVerticalPosition);
+                    matchableInstance.InitializePoolableAtLocalPosition(_board, newPosition);
+                    
+                    //Adding to list
+                    matchablesForNodesToUpdate.Add(matchableInstance);
+                    auxCounter++;
                 }
 
-                //Empty remaining nodes
-                for (int index = indicesToLoop; index < boardNodesToUpdate.Count; index++)
+                for (int i = 0; i < boardNodesToUpdate.Count; i++)
                 {
-                    boardNodesToUpdate[index].EmptyNode();
+                    boardNodesToUpdate[i].SetMatchable(matchablesForNodesToUpdate[i]);
                 }
-
-                //This can be optimizable once I have figured out how to add new items.
+                
                 foreach (var nodeToUpdate in boardNodesToUpdate)
                 {
                     nodeToUpdate.Update();
