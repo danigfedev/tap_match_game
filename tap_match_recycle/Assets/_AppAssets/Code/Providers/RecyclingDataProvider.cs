@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _AppAssets.Code
 {
     [CreateAssetMenu(fileName = "RecyclingDataProvider", menuName = "TapMatchRecycle/Providers/RecyclingDataProvider")]
     public class RecyclingDataProvider : ScriptableObject
     {
-        // public RecyclingTypeProvider RecyclingTypesPovider;
-        
         public RecyclingData[] RecyclingTypeData;
 
         private System.Random _random;
@@ -24,7 +21,6 @@ namespace _AppAssets.Code
             
             for (int i = 0; i < matchablesQuantity; i++)
             {
-                // int randomIndex = _random.Next(0, Matchables.Length);
                 int randomIndex = _random.Next(0, maxRandomIndex);
                 var randomElement = RecyclingTypeData[randomIndex];
                 randomList.Add(randomElement);

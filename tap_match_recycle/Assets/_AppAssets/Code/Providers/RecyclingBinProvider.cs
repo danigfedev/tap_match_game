@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace _AppAssets.Code
 {
@@ -37,7 +36,6 @@ namespace _AppAssets.Code
             var binInstance = Instantiate(BinPrefab, parent);
             
             binInstance.GetComponent<Bin>().Initialize(recyclingData);
-            // binInstance.GetComponent<Image>().color *= recyclingData.RecyclingTypeColor;
             
             return binInstance;
         }

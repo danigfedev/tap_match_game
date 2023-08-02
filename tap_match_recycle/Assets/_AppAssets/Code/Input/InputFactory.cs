@@ -27,6 +27,4 @@ namespace _AppAssets.Code.Input
             }
         }
     }
-
-    
 }
