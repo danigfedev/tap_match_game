@@ -1,8 +1,9 @@
 using System.Collections;
+using _AppAssets.Code.GameManagement.GameModesSystem;
 using _AppAssets.Code.Input;
 using UnityEngine;
 
-namespace _AppAssets.Code
+namespace _AppAssets.Code.GameManagement
 {
     public class GameManager : MonoBehaviour
     {
@@ -10,6 +11,7 @@ namespace _AppAssets.Code
         [SerializeField] private RecyclingBinsManager _binsManager;
         [SerializeField] private BoardManager _boardManager;
 
+        private GameMode _currentGameMode;
         private GameStates _currentGameState;
         private DisplayManager _displayManager;
         private InputManager _inputManager;
@@ -52,10 +54,9 @@ namespace _AppAssets.Code
                     _boardManager.FindMatchesAndUpdateBoard(_lastTappedMatchable);
                     break;
                 case GameStates.CHECK_GAME_END:
-                    
-                    //TODO Implement simple Game Mode system (only default mode)
-                    
-                    ChangeGameState(GameStates.WAIT_FOR_INPUT);
+
+                    var endGameStatus = _currentGameMode.CheckEndOfGameStatus();
+                    HandleEndOfGame(endGameStatus);
                     break;
                 case GameStates.CONFIGURE_GAME:
                     break;
@@ -64,6 +65,7 @@ namespace _AppAssets.Code
 
         private void InitializeGame()
         {
+            _currentGameMode = GameModeFactory.CreateGameMode(GameModes.DEFAULT);
             _inputManager = InputFactory.CreateInputManager(gameObject, Application.platform);
             _inputManager.Initialize();
 
@@ -112,6 +114,21 @@ namespace _AppAssets.Code
         private void OnBoardUpdated()
         {
             ChangeGameState(GameStates.CHECK_GAME_END);
+        }
+        
+        private void HandleEndOfGame(EndGameStatus endGameStatus)
+        {
+            switch (endGameStatus)
+            {
+                case EndGameStatus.WIN:
+                    break;
+                case EndGameStatus.LOSE:
+                    break;
+                case EndGameStatus.KEEP_PLAYING:
+                default:
+                    ChangeGameState(GameStates.WAIT_FOR_INPUT);
+                    break;
+            }
         }
     }
 }
