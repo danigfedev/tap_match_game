@@ -4,7 +4,7 @@ namespace _AppAssets.Code.Input
 {
     public class InputFactory
     {
-        public static InputManager<T> CreateInputManager<T>(RuntimePlatform platform) where T : MonoBehaviour, IPoolable
+        public static InputManager CreateInputManager(GameObject manager, RuntimePlatform platform)
         {
             switch (platform)
             {
@@ -12,16 +12,17 @@ namespace _AppAssets.Code.Input
                 case RuntimePlatform.WindowsEditor:
                 case RuntimePlatform.OSXEditor:
                 {
-                    return new EditorInputManager<T>();
+                    var a = manager.AddComponent<EditorInputManager>();
+                    return a;
                 }
                 case RuntimePlatform.Android:
                 case RuntimePlatform.IPhonePlayer:
                 {
-                    return new MobileInputManager<T>();
+                    return manager.AddComponent<MobileInputManager>();
                 }
                 default:
                 {
-                    Debug.LogWarning("Platform not suppoted");
+                    Debug.LogWarning("Platform not supported");
                     return null;
                 }
             }

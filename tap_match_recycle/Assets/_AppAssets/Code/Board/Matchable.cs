@@ -4,17 +4,27 @@ using System.Linq;
 using _AppAssets.Code.Settings;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _AppAssets.Code
 {
     public class Matchable : MonoBehaviour, IPoolable
     {
-        public event Action OnMatchableSentToBin; //Maybe this is the same as OnSendToPool? Will be called at the same point
+        public event Action<Matchable> OnAnimationEnded;
         public event Action<IPoolable> OnSendToPool;
 
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private SortingLayerSettings _sortingLayerSettings;
         
+        [FormerlySerializedAs("_animationDuration")]
+        [Space]
+        [Header("Animation Parameters")] 
+        [SerializeField] private float _fallingAnimationDuration = 0.5f;
+        [SerializeField] private Ease _fallingAnimationEase = Ease.OutBounce;
+        [SerializeField] private float _toBinAnimationDuration = 0.5f;
+        [SerializeField] private Ease _toBinAnimationEase = Ease.Linear;
+        // [SerializeField] private AnimationCurve _toBinAnimationEase;
+
         public BoardNode BoardNode { get; private set; }
         public bool IsMatched { get; private set; }
         public RecyclingTypes Type => _data.RecyclingType;
@@ -34,48 +44,6 @@ namespace _AppAssets.Code
                 color.a = 1 - heightDiff;
                 _spriteRenderer.color = color;
             }
-        }
-        
-        public void SetMatchableData(RecyclingData data, Transform bin)
-        {
-            _data = data;
-            _bin = bin;
-        }
-        
-        public void SetMatchableData(RecyclingData data, BoardNode boardNode, Transform bin)
-        {
-            _data = data;
-            _bin = bin;
-            SetBoardNodeData(boardNode);
-        }
-
-        public void Animate()
-        {
-            if (BoardNode == null)
-            {
-                SendToBin();
-            }
-            else
-            {
-                transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
-            }
-        }
-
-        public void MarkAsMatched()
-        {
-            IsMatched = true;
-        }
-
-        public void DetachFromBoard()
-        { 
-            BoardNode.EmptyNode();
-            BoardNode = null;
-        }
-
-        public List<Matchable> GetAdjacentMatchables()
-        {
-            var adjacentNodes = BoardNode.GetAdjacentNodes();
-            return adjacentNodes.Select(node => node.Matchable).ToList();
         }
         
         public void InitializePoolable(Transform parent)
@@ -109,11 +77,77 @@ namespace _AppAssets.Code
             _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableDefault;
             gameObject.SetActive(false);
         }
-
+        
+        public void SetMatchableData(RecyclingData data, Transform bin)
+        {
+            _data = data;
+            _bin = bin;
+        }
+        
+        public void SetMatchableData(RecyclingData data, BoardNode boardNode, Transform bin)
+        {
+            _data = data;
+            _bin = bin;
+            SetBoardNodeData(boardNode);
+        }
+        
         public void SetBoardNodeData(BoardNode node)
         {
             BoardNode = node;
             Coordinates = BoardNode.Coordinates;
+        }
+
+        public void MarkAsMatched()
+        {
+            IsMatched = true;
+        }
+
+        public void DetachFromBoard()
+        { 
+            BoardNode.EmptyNode();
+            BoardNode = null;
+        }
+
+        public List<Matchable> GetAdjacentMatchables()
+        {
+            var adjacentNodes = BoardNode.GetAdjacentNodes();
+            return adjacentNodes.Select(node => node.Matchable).ToList();
+        }
+        
+        public void Animate()
+        {
+            if (BoardNode == null)
+            {
+                MoveToBin();
+            }
+            else
+            {
+                MoveToBoardNode();
+            }
+        }
+
+        private void MoveToBin()
+        {
+            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableOverlay;
+            transform.DOMove(_bin.position, _toBinAnimationDuration)
+                .SetEase(_toBinAnimationEase)
+                .OnComplete(() =>
+            {
+                ResetAndSendToPool();
+                FireOnAnimationEndedEvent();
+            });
+        }
+        
+        private void MoveToBoardNode()
+        {
+            transform.DOLocalMoveY(Coordinates.Row, _fallingAnimationDuration)
+                .SetEase(_fallingAnimationEase)
+                .OnComplete(FireOnAnimationEndedEvent);
+        }
+
+        private void FireOnAnimationEndedEvent()
+        {
+            OnAnimationEnded?.Invoke(this);
         }
         
         private void ResetMatchableData()
@@ -121,15 +155,6 @@ namespace _AppAssets.Code
             _data = null;
             BoardNode = null;
             IsMatched = false;
-        }
-
-        private void SendToBin()
-        {
-            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableOverlay;
-            transform.DOMove(_bin.position, 0.5f).OnComplete(() =>
-            {
-                ResetAndSendToPool();
-            });
         }
     }
 }

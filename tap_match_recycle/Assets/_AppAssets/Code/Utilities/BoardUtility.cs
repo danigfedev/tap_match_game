@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace _AppAssets.Code.Utilities
@@ -21,10 +22,11 @@ namespace _AppAssets.Code.Utilities
             }
         }
         
-        public static void Animate(this List<Matchable> matches)
+        public static void Animate(this List<Matchable> matches, Action<Matchable> callback)
         {
             foreach (var matchable in matches)
             {
+                matchable.OnAnimationEnded += callback;
                 matchable.Animate();
             }
         }

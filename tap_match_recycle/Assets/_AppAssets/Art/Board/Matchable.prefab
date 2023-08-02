@@ -48,6 +48,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 385152433723763349}
   _sortingLayerSettings: {fileID: 11400000, guid: fba289b52594340ed83e9d8faf6227ab, type: 2}
+  _fallingAnimationDuration: 0.5
+  _fallingAnimationEase: 30
+  _toBinAnimationDuration: 0.5
+  _toBinAnimationEase: 1
 --- !u!61 &2160110412984877579
 BoxCollider2D:
   m_ObjectHideFlags: 0

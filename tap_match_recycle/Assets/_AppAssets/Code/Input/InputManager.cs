@@ -5,61 +5,67 @@ using UnityInput = UnityEngine.Input;
 
 namespace _AppAssets.Code.Input
 {
-    public abstract class InputManager<T> where T : MonoBehaviour, IPoolable
+    public abstract class InputManager : MonoBehaviour
     {
-        public event Action<T> OnItemTapped;
+        public event Action<GameObject> OnItemTapped;
 
         protected bool _inputBlocked;
 
         protected Camera _mainCamera;
 
-        public InputManager()
+        public void Initialize()
         {
             _mainCamera = Camera.main;
+            _inputBlocked = true;
         }
         
         public abstract void HandleInput();
-        
+
+        private void Update()
+        {
+            if (_inputBlocked)
+            {
+                return;
+            }
+            
+            HandleInput();
+        }
+
         public void ToggleInputBlocked(bool blocked)
         {
             _inputBlocked = blocked;
         }
 
-        protected void RaiseOnItemTappedEvent(T item)
+        protected void CastRay()
         {
-            OnItemTapped?.Invoke(item);
+            if (_mainCamera.RayCastToScreenPosition(UnityInput.mousePosition, out GameObject hitObject))
+            {
+                RaiseOnItemTappedEvent(hitObject);
+            }
+        }
+        
+        protected void RaiseOnItemTappedEvent(GameObject hitObject)
+        {
+            OnItemTapped?.Invoke(hitObject);
         }
     }
     
     
-    public class EditorInputManager<T> : InputManager<T> where T : MonoBehaviour, IPoolable
+    public class EditorInputManager : InputManager
     {
         public override void HandleInput()
         {
-            if (_inputBlocked)
-            {
-                return;
-            }
-            
             if (UnityEngine.Input.GetMouseButtonUp(0))
             {
-                if (_mainCamera.RayCastToScreenPosition<T>(UnityInput.mousePosition, out T hitObject))
-                {
-                    RaiseOnItemTappedEvent(hitObject);
-                }
+                CastRay();
             }
         }
     }
 
-    public class MobileInputManager<T> : InputManager<T> where T : MonoBehaviour, IPoolable
+    public class MobileInputManager : InputManager
     {
         public override void HandleInput()
         {
-            if (_inputBlocked)
-            {
-                return;
-            }
-            
             if (UnityInput.touches.Length > 0)
             {
                 Touch mainTouch = UnityInput.GetTouch(0);
@@ -68,10 +74,7 @@ namespace _AppAssets.Code.Input
                 {
                     Vector3 inputPos = mainTouch.position;
                     
-                    if (_mainCamera.RayCastToScreenPosition<T>(inputPos, out T hitObject))
-                    {
-                        RaiseOnItemTappedEvent(hitObject);
-                    }
+                    CastRay();
                 }
             }
         }

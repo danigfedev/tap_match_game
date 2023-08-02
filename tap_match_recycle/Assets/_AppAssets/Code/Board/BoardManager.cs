@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using _AppAssets.Code.Utilities;
@@ -8,11 +9,16 @@ namespace _AppAssets.Code
     public class BoardManager : MonoBehaviourPool<Matchable>
     {
         [SerializeField] private RecyclingDataProvider recyclingDataProvider;
+
+        public event Action OnBoardUpdated;
+        
         private GameSettings _gameSettings;
         private DisplayManager _displayManager;
         private RecyclingBinsManager _binsManager;
         private Transform _board;
         private BoardNode[,] _boardNodes;
+        private int _totalAnimatedMatchables;
+        private int _finishedAnimationsCounter;
 
         public void Initialize(GameSettings gameSettings, DisplayManager displayManager, RecyclingBinsManager binsManager)
         {
@@ -62,9 +68,23 @@ namespace _AppAssets.Code
                 .GroupBy(node => node.Coordinates.Column);
 
             var matchablesToAnimate = RecalculateBoard(groupedEmptyNodes);
-            
             matchablesToAnimate.AddRange(matches);
-            matchablesToAnimate.Animate();
+
+            _totalAnimatedMatchables = matchablesToAnimate.Count;
+            _finishedAnimationsCounter = 0;
+            
+            matchablesToAnimate.Animate(OnAnimationEnded);
+        }
+
+        private void OnAnimationEnded(Matchable animatedMatchable)
+        {
+            animatedMatchable.OnAnimationEnded -= OnAnimationEnded;
+            _finishedAnimationsCounter++;
+            
+            if (_finishedAnimationsCounter == _totalAnimatedMatchables)
+            {
+                OnBoardUpdated?.Invoke();
+            }
         }
 
         private List<Matchable> RecalculateBoard(IEnumerable<IGrouping<int, BoardNode>> groupedMatches)

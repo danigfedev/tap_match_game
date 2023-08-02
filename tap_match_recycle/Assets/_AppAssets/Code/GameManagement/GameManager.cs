@@ -10,32 +10,19 @@ namespace _AppAssets.Code
         [SerializeField] private RecyclingBinsManager _binsManager;
         [SerializeField] private BoardManager _boardManager;
 
+        private GameStates _currentGameState;
         private DisplayManager _displayManager;
-        private InputManager<Matchable> _inputManager;
+        private InputManager _inputManager;
+        private Matchable _lastTappedMatchable;
 
+        private void Awake()
+        {
+            _currentGameState = GameStates.UNDEFINED;
+        }
+        
         private void Start()
         {
-            _inputManager = InputFactory.CreateInputManager<Matchable>(Application.platform);
-            _inputManager.OnItemTapped += OnItemTapped;
-
-            _displayManager = new DisplayManager();
-            _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
-            _binsManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
-            _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
-            
-            //IDEA: Here the State Machine should start
-            
-            StartCoroutine(SetupGame());
-        }
-
-        private void Update()
-        {
-            _inputManager.HandleInput();
-        }
-
-        private void OnItemTapped(Matchable tappedItem)
-        {
-            _boardManager.FindMatchesAndUpdateBoard(tappedItem);
+            ChangeGameState(GameStates.INITIALIZE_GAME);
         }
         
         public void ResetBoard()
@@ -45,6 +32,57 @@ namespace _AppAssets.Code
             StartCoroutine(SetupGame());
         }
 
+        private void ChangeGameState(GameStates newState)
+        {
+            _currentGameState = newState;
+
+            switch (_currentGameState)
+            {
+                case GameStates.INITIALIZE_GAME:
+                    InitializeGame();
+                    break;
+                case GameStates.SET_UP_BOARD:
+                    StartCoroutine(SetupGame());
+                    break;
+                case GameStates.WAIT_FOR_INPUT:
+                    _inputManager.ToggleInputBlocked(false);
+                    break;
+                case GameStates.UPDATE_BOARD:
+                    _inputManager.ToggleInputBlocked(true);
+                    _boardManager.FindMatchesAndUpdateBoard(_lastTappedMatchable);
+                    break;
+                case GameStates.CHECK_GAME_END:
+                    
+                    //TODO Implement simple Game Mode system (only default mode)
+                    
+                    ChangeGameState(GameStates.WAIT_FOR_INPUT);
+                    break;
+                case GameStates.CONFIGURE_GAME:
+                    break;
+            }
+        }
+
+        private void InitializeGame()
+        {
+            _inputManager = InputFactory.CreateInputManager(gameObject, Application.platform);
+            _inputManager.Initialize();
+
+            _displayManager = new DisplayManager();
+            _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
+            _binsManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
+            _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
+
+            SubscribeToEvents();
+            
+            ChangeGameState(GameStates.SET_UP_BOARD);
+        }
+
+        private void SubscribeToEvents()
+        {
+            _inputManager.OnItemTapped += OnMatchableTapped;
+            _boardManager.OnBoardUpdated += OnBoardUpdated;
+        }
+        
         private IEnumerator SetupGame()
         {
             var screenOrientationCoroutine = StartCoroutine(_displayManager.ConfigureScreenOrientation());
@@ -54,6 +92,26 @@ namespace _AppAssets.Code
             _displayManager.ConfigureCameraOrtographicSize();
 
             _boardManager.BuildGameBoard();
+            
+            ChangeGameState(GameStates.WAIT_FOR_INPUT);
+        }
+
+        private void OnMatchableTapped(GameObject tappedObject)
+        {
+            var tappedMatchable = tappedObject.GetComponent<Matchable>();
+
+            if (tappedMatchable == null)
+            {
+                return;
+            }
+            
+            _lastTappedMatchable = tappedMatchable;
+            ChangeGameState(GameStates.UPDATE_BOARD);
+        }
+        
+        private void OnBoardUpdated()
+        {
+            ChangeGameState(GameStates.CHECK_GAME_END);
         }
     }
 }
