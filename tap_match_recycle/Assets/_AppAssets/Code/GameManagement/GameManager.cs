@@ -22,7 +22,7 @@ namespace _AppAssets.Code
 
             _displayManager = new DisplayManager();
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
-            _binsManager.Initialize();
+            _binsManager.Initialize(_gameSettingsProvider.DisplaySettings);
             _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
             
             //IDEA: Here the State Machine should start
