@@ -77,8 +77,7 @@ namespace _AppAssets.Code
         public void InitializePoolable(Transform parent)
         {
             var coordinates = BoardNode.Coordinates;
-            var initialPosition = transform.localPosition +
-                                  (Vector3)(Vector2.right * coordinates.Column + Vector2.up * coordinates.Row);
+            var initialPosition = Vector2.right * coordinates.Column + Vector2.up * coordinates.Row;
 
             InitializePoolableAtLocalPosition(parent, initialPosition);
         }
@@ -94,6 +93,12 @@ namespace _AppAssets.Code
             _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableDefault;
         }
 
+        public void ResetAndSendToPool()
+        {
+            ResetPoolable();
+            OnSendToPool?.Invoke(this);
+        }
+        
         public void ResetPoolable()
         {
             ResetMatchableData();
@@ -101,12 +106,6 @@ namespace _AppAssets.Code
             transform.localPosition = Vector3.zero;
             _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableDefault;
             gameObject.SetActive(false);
-        }
-
-        public void ResetAndSendToPool()
-        {
-            ResetPoolable();
-            OnSendToPool?.Invoke(this);
         }
 
         private void SetBoardNodeData(BoardNode node)

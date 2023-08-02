@@ -22,7 +22,7 @@ namespace _AppAssets.Code
 
             _displayManager = new DisplayManager();
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
-            _binsManager.Initialize(_gameSettingsProvider.DisplaySettings);
+            _binsManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
             
             //IDEA: Here the State Machine should start
@@ -47,20 +47,9 @@ namespace _AppAssets.Code
         [ContextMenu("Reset Board")]
         public void ResetBoard()
         {
+            _binsManager.UpdateBinsPanel();
             _boardManager.ClearBoard();
             StartCoroutine(SetupGame());
-        }
-        
-        [ContextMenu("Set Orientation Landscape Left")]
-        public void SetOrientationLandscapeLeft()
-        {
-            Screen.orientation = ScreenOrientation.LandscapeLeft;
-        }
-        
-        [ContextMenu("Set Orientation Portrait")]
-        public void SetOrientationPortrait()
-        {
-            Screen.orientation = ScreenOrientation.Portrait;
         }
 
         private IEnumerator SetupGame()

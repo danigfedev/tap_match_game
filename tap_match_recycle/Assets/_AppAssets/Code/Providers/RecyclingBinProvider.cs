@@ -10,10 +10,14 @@ namespace _AppAssets.Code
         public GameObject BinPrefab;
         public RecyclingDataProvider RecyclingDataProvider;
         public int TotalBinCount => RecyclingDataProvider.RecyclingTypeData.Length;
-        
-        public Dictionary<RecyclingTypes,GameObject> InstantiateAllBins(Transform parent)
+
+        public Dictionary<RecyclingTypes, GameObject> InstantiateAllBins(Transform parent)
         {
-            var binCount = TotalBinCount;
+            return InstantiateBins(TotalBinCount, parent);
+        }
+        
+        public Dictionary<RecyclingTypes,GameObject> InstantiateBins(int binCount, Transform parent)
+        {
             var recyclingTypeData = RecyclingDataProvider.RecyclingTypeData;
             
             var binDictionary = new Dictionary<RecyclingTypes, GameObject>(binCount);

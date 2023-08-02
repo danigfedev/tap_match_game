@@ -9,21 +9,35 @@ namespace _AppAssets.Code
         [SerializeField] private RecyclingBinProvider _binsProvider;
         [SerializeField] private GameObject _binCointainer;
 
+        private GameSettings _gameSettings;
         private DisplaySettings _displaySettings;
         private RectTransform _rectTransform;
         private Dictionary<RecyclingTypes, GameObject> _typeToBinInstanceMap;
         
         [ContextMenu("Initialize")]
-        public void Initialize(DisplaySettings displaySettings)
+        public void Initialize(GameSettings gameSettings, DisplaySettings displaySettings)
         {
+            _gameSettings = gameSettings;
             _displaySettings = displaySettings;
             _rectTransform = _binCointainer.GetComponent<RectTransform>();
 
             AdjustDimensions();
             
             _typeToBinInstanceMap = _binsProvider.InstantiateAllBins(_binCointainer.transform);
+            UpdateBinsPanel();
+        }
+
+        public void UpdateBinsPanel()
+        {
+            var data = _binsProvider.RecyclingDataProvider.RecyclingTypeData;
             
-            //Maybe configure with the item sprite? To make it easier to identify
+            for (int i = 0; i < data.Length; i++)
+            {
+                var binActiveStatus = i < _gameSettings.NumberOfMatchables;
+
+                var binInstance = GetBinInstanceByType(data[i].RecyclingType);
+                binInstance.SetActive(binActiveStatus);
+            }
         }
 
         public GameObject GetBinInstanceByType(RecyclingTypes type)
