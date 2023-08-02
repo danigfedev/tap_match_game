@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using _AppAssets.Code.Utilities;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _AppAssets.Code
 {
@@ -41,6 +39,132 @@ namespace _AppAssets.Code
             PopulateBoard();
         }
 
+        public void ClearBoard()
+        {
+            ResetPool();
+        }
+
+        public void FindMatchesAndUpdateBoard(Matchable tappedMatchable)
+        {
+            //Flow:
+            // 1 - Find Matches 
+            // 2 - Detach matches from board
+            // 3 - Recalculate Board
+            // 5 - Trigger animations
+            
+            var matches = new List<Matchable>();
+            FindMatches(tappedMatchable, tappedMatchable.Type, ref matches);
+            
+            matches.DetachFromBoard();
+
+            var groupedEmptyNodes = _boardNodes.Cast<BoardNode>()
+                .Where(node => node.IsEmpty)
+                .GroupBy(node => node.Coordinates.Column);
+
+            var matchablesToAnimate = RecalculateBoard(groupedEmptyNodes);
+            
+            matchablesToAnimate.AddRange(matches);
+            matchablesToAnimate.Animate();
+        }
+
+        private List<Matchable> RecalculateBoard(IEnumerable<IGrouping<int, BoardNode>> groupedMatches)
+        {
+            var totalMatchablesToUpdate = new List<Matchable>();
+            
+            //Board nodes grouped by column in the board
+            foreach (var nodeGroup in groupedMatches)
+            {
+                var column = nodeGroup.Key;
+                var boardNodesToUpdate = nodeGroup.OrderBy(node => node.Coordinates.Row).ToList();
+                
+                //Get all nodes that need to be updated
+                var firstNotMatchedNodeIndexInBoard = boardNodesToUpdate.Last().Coordinates.Row + 1;
+                for (int row = firstNotMatchedNodeIndexInBoard; row < _gameSettings.BoardHeight; row++)
+                {
+                    boardNodesToUpdate.Add(_boardNodes[column, row]);
+                }
+
+                //Get all matchables that remain in the board
+                var matchablesForNodesToUpdate = new List<Matchable>();
+                
+                var remainingMatchablesInBoard = boardNodesToUpdate
+                    .Where(n => !n.IsEmpty)
+                    .Select(n => n.Matchable);
+                
+                matchablesForNodesToUpdate.AddRange(remainingMatchablesInBoard);
+                
+                //Add replacements for the matches that will be removed from the board
+                var newMatchables = PopulateMatchablesReplacements(boardNodesToUpdate, matchablesForNodesToUpdate, column);
+                matchablesForNodesToUpdate.AddRange(newMatchables);
+
+                //Make each node in the current column points to the corresponding matchable
+                for (int i = 0; i < boardNodesToUpdate.Count; i++)
+                {
+                    boardNodesToUpdate[i].SetMatchable(matchablesForNodesToUpdate[i]);
+                }
+                
+                // Append the matchables from the current column to the list of matchables
+                // remaining on the board that will be animated. 
+                totalMatchablesToUpdate.AddRange(matchablesForNodesToUpdate);
+            }
+
+            return totalMatchablesToUpdate;
+        }
+
+        private List<Matchable> PopulateMatchablesReplacements(List<BoardNode> boardNodesToUpdate, List<Matchable> matchablesForNodesToUpdate, int boardColumn)
+        {
+            var newNodesCount = boardNodesToUpdate.Count - matchablesForNodesToUpdate.Count;
+            var randomMatchableData =
+                recyclingDataProvider.GetRandomMatchables(newNodesCount, _gameSettings.NumberOfMatchables);
+            var newMatchables = new List<Matchable>();
+            int auxCounter = 0;
+            for (int i = 0; i < newNodesCount; i++)
+            {
+                var matchableInstance = GetItemFromPool();
+                var matchableData = randomMatchableData[auxCounter];
+                var matchableBin = _binsManager.GetBinInstanceByType(matchableData.RecyclingType);
+                matchableInstance.SetMatchableData(matchableData, matchableBin.transform);
+
+                //Setting matchable at the top of the board
+                var newMatchableVerticalPosition = _gameSettings.BoardHeight + auxCounter;
+                var newMatachableHorizontalPosition = boardColumn;
+                var newPosition = new Vector2(newMatachableHorizontalPosition, newMatchableVerticalPosition);
+                matchableInstance.InitializePoolableAtLocalPosition(_board, newPosition);
+                
+                newMatchables.Add(matchableInstance);
+                auxCounter++;
+            }
+
+            return newMatchables;
+        }
+
+        private void FindMatches(Matchable tappedMatchable, RecyclingTypes typeToMatch, ref List<Matchable> matches)
+        {
+            if (tappedMatchable == null) //This check should be unnecessary when whole game is done
+            {
+                return;
+            }
+            
+            if (tappedMatchable.Type != typeToMatch)
+            {
+                return;
+            }
+
+            if (tappedMatchable.IsMatched)
+            {
+                return;
+            }
+
+            matches.Add(tappedMatchable);
+            tappedMatchable.MarkAsMatched();
+            
+            var adjacentMatchables = tappedMatchable.GetAdjacentMatchables();
+            foreach (var adjacentMatchable in adjacentMatchables)
+            {
+                FindMatches(adjacentMatchable, typeToMatch, ref matches);
+            }
+        }
+        
         private Vector2 CalculateBoardLowerLeftCorner()
         {
             var boardCenterPosition = _displayManager.GetBoardAreaCenter();
@@ -48,12 +172,7 @@ namespace _AppAssets.Code
             var lowerLeftCorner = boardCenterPosition - boardDimensions;
             return lowerLeftCorner;
         }
-
-        public void ClearBoard()
-        {
-            ResetPool();
-        }
-
+        
         private void PopulateBoard()
         {
             var boardWidth = _gameSettings.BoardWidth;
@@ -91,110 +210,6 @@ namespace _AppAssets.Code
         private int CalculatePoolSize()
         {
             return _gameSettings.BoardWidth * _gameSettings.BoardHeight * 2;
-        }
-
-        public void FindMatchesAndUpdateBoard(Matchable tappedMatchable)
-        {
-            var matches = new List<Matchable>();
-            FindMatches(tappedMatchable, tappedMatchable.Type, ref matches);
-            
-            var matchingNodes = matches.Select(matchable => matchable.BoardNode).ToList();
-            var groupedNodes = matchingNodes.GroupBy(node => node.Coordinates.Column);
-            
-            //Flow should be:
-            // 1 - FInd Matches 
-            // 2 - Detach matches from board
-            // 3 - Recalculate Board (update existing data)
-            // 5 - Update nodes
-
-            matches.DetachFromBoard();
-            
-            //TODO Refactor this. Maybe thi can return the list of updated nodes
-            UpdateBoard(groupedNodes);//Rename this to RecaulculateBoard or something like that
-            
-            //nodesToUpdate.Update();
-        }
-
-        private void UpdateBoard(IEnumerable<IGrouping<int, BoardNode>> groupedMatches)
-        {
-            //Maybe do this insde a SelectMany method?
-            foreach (var nodeGroup in groupedMatches)
-            {
-                var column = nodeGroup.Key;
-                var boardNodesToUpdate = nodeGroup.OrderBy(node => node.Coordinates.Row).ToList();
-                
-                var firstNotMatchedNodeIndexInBoard = boardNodesToUpdate.Last().Coordinates.Row + 1;
-                for (int row = firstNotMatchedNodeIndexInBoard; row < _gameSettings.BoardHeight; row++)
-                {
-                    boardNodesToUpdate.Add(_boardNodes[column, row]);
-                }
-
-                //New implementation:
-                var matchablesForNodesToUpdate = new List<Matchable>();
-                var remainingMatchablesInBoard = boardNodesToUpdate.Where(n => !n.IsEmpty).Select(n => n.Matchable);
-                matchablesForNodesToUpdate.AddRange(remainingMatchablesInBoard);
-
-                //Get new matchables from pool ==============================
-                var newNodesCount = boardNodesToUpdate.Count - matchablesForNodesToUpdate.Count;
-                var randomMatchableData = recyclingDataProvider.GetRandomMatchables(newNodesCount, _gameSettings.NumberOfMatchables);
-                Matchable matchableInstance;
-                int auxCounter = 0;
-                for (int i = 0; i < newNodesCount; i++)
-                {
-                    matchableInstance = GetItemFromPool();
-                    var matchableData = randomMatchableData[auxCounter];
-                    var matchableBin = _binsManager.GetBinInstanceByType(matchableData.RecyclingType);
-                    matchableInstance.SetMatchableData(matchableData, matchableBin.transform);
-
-                    //Setting matchable position at board's top
-                    var newMatchableVerticalPosition = _gameSettings.BoardHeight + auxCounter;
-                    var newMatachableHorizontalPosition = column;
-                    // var newMatachableHorizontalPosition = nodeToUpdate.Coordinates.Column;
-                    var newPosition = new Vector2(newMatachableHorizontalPosition, newMatchableVerticalPosition);
-                    matchableInstance.InitializePoolableAtLocalPosition(_board, newPosition);
-                    
-                    //Adding to list
-                    matchablesForNodesToUpdate.Add(matchableInstance);
-                    auxCounter++;
-                }
-
-                for (int i = 0; i < boardNodesToUpdate.Count; i++)
-                {
-                    boardNodesToUpdate[i].SetMatchable(matchablesForNodesToUpdate[i]);
-                }
-                
-                foreach (var nodeToUpdate in boardNodesToUpdate)
-                {
-                    nodeToUpdate.Update();
-                }
-            }
-        }
-
-        private void FindMatches(Matchable tappedMatchable, RecyclingTypes typeToMatch, ref List<Matchable> matches)
-        {
-            if (tappedMatchable == null) //This check should be unnecessary when whole game is done
-            {
-                return;
-            }
-            
-            if (tappedMatchable.Type != typeToMatch)
-            {
-                return;
-            }
-
-            if (tappedMatchable.IsMatched)
-            {
-                return;
-            }
-
-            matches.Add(tappedMatchable);
-            tappedMatchable.MarkAsMatched();
-            
-            var adjacentMatchables = tappedMatchable.GetAdjacentMatchables();
-            foreach (var adjacentMatchable in adjacentMatchables)
-            {
-                FindMatches(adjacentMatchable, typeToMatch, ref matches);
-            }
         }
     }
 }

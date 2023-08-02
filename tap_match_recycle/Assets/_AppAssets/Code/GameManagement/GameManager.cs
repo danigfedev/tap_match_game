@@ -1,13 +1,11 @@
 using System.Collections;
 using _AppAssets.Code.Input;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _AppAssets.Code
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField] private TMPro.TextMeshProUGUI _debugText;
         [SerializeField] private GameSettingsProvider _gameSettingsProvider;
         [SerializeField] private RecyclingBinsManager _binsManager;
         [SerializeField] private BoardManager _boardManager;
@@ -37,14 +35,9 @@ namespace _AppAssets.Code
 
         private void OnItemTapped(Matchable tappedItem)
         {
-            var message = "Object hit: " + tappedItem.Type;
-            _debugText.text = message;
-            // Debug.Log(message);
-            
             _boardManager.FindMatchesAndUpdateBoard(tappedItem);
         }
-
-        [ContextMenu("Reset Board")]
+        
         public void ResetBoard()
         {
             _binsManager.UpdateBinsPanel();

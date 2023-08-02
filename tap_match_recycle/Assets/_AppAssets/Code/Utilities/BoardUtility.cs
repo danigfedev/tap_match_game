@@ -20,5 +20,13 @@ namespace _AppAssets.Code.Utilities
                 matchable.DetachFromBoard();
             }
         }
+        
+        public static void Animate(this List<Matchable> matches)
+        {
+            foreach (var matchable in matches)
+            {
+                matchable.Animate();
+            }
+        }
     }
 }

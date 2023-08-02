@@ -30,18 +30,14 @@ namespace _AppAssets.Code
         public void SetMatchable(Matchable matchable)
         {
             Matchable = matchable;
+            Matchable.SetBoardNodeData(this);
         }
 
         public void EmptyNode()
         {
             Matchable = null;
         }
-
-        public void Update()
-        {
-            Matchable?.Update(this);
-        }
-
+        
         public List<BoardNode> GetAdjacentNodes()
         {
             var validAdjacentNodes = new List<BoardNode>();

@@ -27,10 +27,13 @@ namespace _AppAssets.Code
         {
             //TODO check matchable bounciness
             //TODO Optimize this to only affect matchables from above
-            var heightDiff = transform.localPosition.y - (BoardNode.BoardHeight - 0.5f);
-            var color = _spriteRenderer.color;
-            color.a = 1 - heightDiff;
-            _spriteRenderer.color = color;
+            if (BoardNode != null && transform.localPosition.y >= BoardNode.BoardHeight - 1)
+            {
+                var heightDiff = transform.localPosition.y - (BoardNode.BoardHeight - 0.5f);
+                var color = _spriteRenderer.color;
+                color.a = 1 - heightDiff;
+                _spriteRenderer.color = color;
+            }
         }
         
         public void SetMatchableData(RecyclingData data, Transform bin)
@@ -45,11 +48,17 @@ namespace _AppAssets.Code
             _bin = bin;
             SetBoardNodeData(boardNode);
         }
-        
-        public void Update(BoardNode newNode)
+
+        public void Animate()
         {
-            SetBoardNodeData(newNode);
-            transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
+            if (BoardNode == null)
+            {
+                SendToBin();
+            }
+            else
+            {
+                transform.DOLocalMoveY(Coordinates.Row, 0.5f).SetEase(Ease.OutBounce);
+            }
         }
 
         public void MarkAsMatched()
@@ -60,12 +69,7 @@ namespace _AppAssets.Code
         public void DetachFromBoard()
         { 
             BoardNode.EmptyNode();
-            
-            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableOverlay;
-            transform.DOMove(_bin.position, 0.5f).OnComplete(() =>
-            {
-                ResetAndSendToPool();
-            });
+            BoardNode = null;
         }
 
         public List<Matchable> GetAdjacentMatchables()
@@ -106,7 +110,7 @@ namespace _AppAssets.Code
             gameObject.SetActive(false);
         }
 
-        private void SetBoardNodeData(BoardNode node)
+        public void SetBoardNodeData(BoardNode node)
         {
             BoardNode = node;
             Coordinates = BoardNode.Coordinates;
@@ -117,6 +121,15 @@ namespace _AppAssets.Code
             _data = null;
             BoardNode = null;
             IsMatched = false;
+        }
+
+        private void SendToBin()
+        {
+            _spriteRenderer.sortingOrder = _sortingLayerSettings.MatchableOverlay;
+            transform.DOMove(_bin.position, 0.5f).OnComplete(() =>
+            {
+                ResetAndSendToPool();
+            });
         }
     }
 }
