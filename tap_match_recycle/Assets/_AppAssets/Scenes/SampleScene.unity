@@ -1817,7 +1817,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolableItem: {fileID: 335564425048662207, guid: d048fceda87874f1982e365a019f5260, type: 3}
-  _matchablesProvider: {fileID: 11400000, guid: f1534987ab8ec418e922c4a5a823b744, type: 2}
+  recyclingDataProvider: {fileID: 11400000, guid: f1534987ab8ec418e922c4a5a823b744, type: 2}
 --- !u!4 &1358346444
 Transform:
   m_ObjectHideFlags: 0

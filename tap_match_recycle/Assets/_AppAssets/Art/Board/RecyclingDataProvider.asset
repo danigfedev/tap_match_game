@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 280fa08078094271905a4919fedd1e9b, type: 3}
+  m_Name: RecyclingDataProvider
+  m_EditorClassIdentifier: 
+  RecyclingTypeData:
+  - RecyclingType: 0
+    Sprite: {fileID: 21300000, guid: cf8e84af3f678496589dae94e2e81992, type: 3}
+    RecyclingTypeColor: {r: 0.3773585, g: 0.31594875, b: 0.25453898, a: 1}
+  - RecyclingType: 1
+    Sprite: {fileID: 21300000, guid: 8250990d3d4ee43348e8a9cea2e919f3, type: 3}
+    RecyclingTypeColor: {r: 1, g: 0.9785239, b: 0.3915094, a: 1}
+  - RecyclingType: 2
+    Sprite: {fileID: 21300000, guid: cf5310f63c67c4092b220ab973094b2c, type: 3}
+    RecyclingTypeColor: {r: 0.17412782, g: 0.37240112, b: 0.8584906, a: 1}
+  - RecyclingType: 3
+    Sprite: {fileID: 21300000, guid: 926d187e3e386412091389c62555c8d2, type: 3}
+    RecyclingTypeColor: {r: 0.32378072, g: 0.6415094, b: 0.34441242, a: 1}
+  - RecyclingType: 4
+    Sprite: {fileID: 21300000, guid: 9b28b92d4716443f8b85947275bb04a9, type: 3}
+    RecyclingTypeColor: {r: 1, g: 0.28773582, b: 0.28773582, a: 1}
+  - RecyclingType: 5
+    Sprite: {fileID: 21300000, guid: 1821752d51dcf499b9209e9c00389b63, type: 3}
+    RecyclingTypeColor: {r: 0.4433962, g: 0.4433962, b: 0.4433962, a: 1}

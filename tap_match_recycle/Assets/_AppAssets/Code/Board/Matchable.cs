@@ -20,7 +20,7 @@ namespace _AppAssets.Code
         public RecyclingTypes Type => _data.RecyclingType;
         public BoardCoordinates Coordinates { get; private set; }
 
-        private MatchableData _data;
+        private RecyclingData _data;
         private Transform _bin;
 
         private void Update()
@@ -33,13 +33,13 @@ namespace _AppAssets.Code
             _spriteRenderer.color = color;
         }
         
-        public void SetMatchableData(MatchableData data, Transform bin)
+        public void SetMatchableData(RecyclingData data, Transform bin)
         {
             _data = data;
             _bin = bin;
         }
         
-        public void SetMatchableData(MatchableData data, BoardNode boardNode, Transform bin)
+        public void SetMatchableData(RecyclingData data, BoardNode boardNode, Transform bin)
         {
             _data = data;
             _bin = bin;

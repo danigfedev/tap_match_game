@@ -8,7 +8,7 @@ namespace _AppAssets.Code
     public class RecyclingBinProvider : ScriptableObject
     {
         public GameObject BinPrefab;
-        public RecyclingTypeProvider RecyclingDataProvider;
+        public RecyclingDataProvider RecyclingDataProvider;
         public int TotalBinCount => RecyclingDataProvider.RecyclingTypeData.Length;
         
         public Dictionary<RecyclingTypes,GameObject> InstantiateAllBins(Transform parent)
@@ -31,7 +31,10 @@ namespace _AppAssets.Code
         {
             var recyclingData = RecyclingDataProvider.GetRecyclingData(type);
             var binInstance = Instantiate(BinPrefab, parent);
-            binInstance.GetComponent<Image>().color *= recyclingData.RecyclingTypeColor;
+            
+            binInstance.GetComponent<Bin>().Initialize(recyclingData);
+            // binInstance.GetComponent<Image>().color *= recyclingData.RecyclingTypeColor;
+            
             return binInstance;
         }
     }

@@ -3,12 +3,13 @@ using System.Linq;
 using _AppAssets.Code.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _AppAssets.Code
 {
     public class BoardManager : MonoBehaviourPool<Matchable>
     {
-        [SerializeField] private MatchablesProvider _matchablesProvider;
+        [SerializeField] private RecyclingDataProvider recyclingDataProvider;
         private GameSettings _gameSettings;
         private DisplayManager _displayManager;
         private RecyclingBinsManager _binsManager;
@@ -60,7 +61,7 @@ namespace _AppAssets.Code
             
             _boardNodes = new BoardNode[boardWidth, boardHeight];
 
-            var randomMatchableData = _matchablesProvider.GetRandomMatchables(boardWidth * boardHeight, _gameSettings.NumberOfMatchables);
+            var randomMatchableData = recyclingDataProvider.GetRandomMatchables(boardWidth * boardHeight, _gameSettings.NumberOfMatchables);
             
             var counter = 0;
             
@@ -135,7 +136,7 @@ namespace _AppAssets.Code
 
                 //Get new matchables from pool ==============================
                 var newNodesCount = boardNodesToUpdate.Count - matchablesForNodesToUpdate.Count;
-                var randomMatchableData = _matchablesProvider.GetRandomMatchables(newNodesCount, _gameSettings.NumberOfMatchables);
+                var randomMatchableData = recyclingDataProvider.GetRandomMatchables(newNodesCount, _gameSettings.NumberOfMatchables);
                 Matchable matchableInstance;
                 int auxCounter = 0;
                 for (int i = 0; i < newNodesCount; i++)

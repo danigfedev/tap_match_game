@@ -4,9 +4,10 @@ using UnityEngine.Serialization;
 namespace _AppAssets.Code
 {
     [System.Serializable]
-    public class MatchableData
+    public class RecyclingData
     {
-        public Sprite Sprite;
         public RecyclingTypes RecyclingType;
+        public Sprite Sprite;
+        public Color RecyclingTypeColor;
     }
 }

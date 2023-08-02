@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: RecyclingBinProvider
   m_EditorClassIdentifier: 
   BinPrefab: {fileID: 4900907432149093430, guid: adfeb60b454df4243aa792e6fde7cbbb, type: 3}
-  RecyclingDataProvider: {fileID: 11400000, guid: 322eefadc8a0648a8a63bb8b40491caa, type: 2}
+  RecyclingDataProvider: {fileID: 11400000, guid: f1534987ab8ec418e922c4a5a823b744, type: 2}
