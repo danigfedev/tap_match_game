@@ -85,8 +85,6 @@ namespace _AppAssets.Code
         public void InitializePoolableAtLocalPosition(Transform parent, Vector2 initialPosition)
         {
             transform.SetParent(parent);
-            transform.localPosition = Vector3.zero;
-
             transform.localPosition = initialPosition;
             
             _spriteRenderer.sprite = _data.Sprite;
