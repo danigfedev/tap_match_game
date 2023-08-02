@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace _AppAssets.Code
+namespace _AppAssets.Code.Interfaces
 {
     public interface IPoolable
     {
