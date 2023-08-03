@@ -69,6 +69,7 @@ namespace _AppAssets.Code.GameManagement
                     //TODO Maybe implement BoardManager.HideBoard, so it's not rendered?
                     break;
                 case GameStates.RESET_GAME:
+                    ResetScores();
                     ResetBoard();
                     break;
             }
