@@ -10,9 +10,9 @@ namespace _AppAssets.Code
         private DisplaySettings _displaySettings;
         private GameSettings _gameSettings;
 
-        public DisplayManager()
+        public DisplayManager(Camera mainCamera)
         {
-            MainCamera = Camera.main;
+            MainCamera = mainCamera;
         }
 
         public void Initialize(DisplaySettings displaySettings, GameSettings gameSettings)
@@ -23,13 +23,28 @@ namespace _AppAssets.Code
         
         public IEnumerator ConfigureScreenOrientation()
         {
-            var screenOrientation = (float)_gameSettings.BoardWidth / _gameSettings.BoardHeight > 1
+            var newScreenOrientation = (float)_gameSettings.BoardWidth / _gameSettings.BoardHeight > 1
                 ? ScreenOrientation.LandscapeLeft
                 : ScreenOrientation.Portrait;
-            
-            Screen.orientation = screenOrientation; //Takes one frame to update. On next frame the width and height values are updated
 
-            yield return new WaitForEndOfFrame();
+            var previousScreenOrientation = Screen.orientation; 
+            Screen.orientation = newScreenOrientation; //Takes one frame to update. On next frame the width and height values are updated
+
+            // if (isGameInitialization)//Not only initializing, but when changing the amount of elements
+            if (previousScreenOrientation == newScreenOrientation)//Not only initializing, but when changing the amount of elements
+            {
+                yield break;
+            }
+            
+            var initialScreenWidth = Screen.width;
+            while (Screen.height != initialScreenWidth)
+            {
+                // Debug.Log($"W: {Screen.width}, H: {Screen.height}");
+                
+                yield return null;
+            }
+            
+            // Debug.Log($"Orientation changed: W: {Screen.width}, H: {Screen.height}");
         }
         
         public void ConfigureCameraOrtographicSize()

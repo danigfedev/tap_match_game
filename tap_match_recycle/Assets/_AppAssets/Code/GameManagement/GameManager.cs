@@ -24,6 +24,7 @@ namespace _AppAssets.Code.GameManagement
         private void Awake()
         {
             _currentGameState = GameStates.UNDEFINED;
+            AdjustFrameRate();
         }
         
         private void Start()
@@ -68,20 +69,29 @@ namespace _AppAssets.Code.GameManagement
             }
         }
 
+        private void AdjustFrameRate()
+        {
+            var platform = Application.platform;
+            
+            if(platform == RuntimePlatform.Android || platform == RuntimePlatform.IPhonePlayer)
+            {
+                Application.targetFrameRate = 60;
+            }
+        }
+        
         private void InitializeGame()
         {
             _currentGameMode = GameModeFactory.CreateGameMode(GameModes.DEFAULT);
             _inputManager = InputFactory.CreateInputManager(gameObject, Application.platform);
             _inputManager.Initialize();
 
-            _displayManager = new DisplayManager();
+            _displayManager = new DisplayManager(Camera.main);
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
             _binsManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
             _gameUIManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             
             ResetScores();
-
             SubscribeToEvents();
             
             ChangeGameState(GameStates.SET_UP_BOARD);
