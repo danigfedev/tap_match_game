@@ -70,6 +70,9 @@ public class GameUIManager : MonoBehaviour
     private string _boardWidthValueLabel;
     private string _boardHeightValueLabel;
 
+    private int _widthSliderValue; 
+    private int _heightSliderValue; 
+
     public void Initialize(GameSettings gameSettings, DisplaySettings displaySettings)
     {
         _gameSettings = gameSettings;
@@ -208,14 +211,16 @@ public class GameUIManager : MonoBehaviour
 
     private void OnBoardWidthSliderChanged(float value)
     {
-        _boardWidthLabel.text = string.Format(_boardWidthValueLabel, value);
-        UpdateOrientationPanel((int)value, _gameSettings.BoardHeight);
+        _widthSliderValue = (int) value;
+        _boardWidthLabel.text = string.Format(_boardWidthValueLabel, _widthSliderValue);
+        UpdateOrientationPanel();
     }
 
     private void OnBoardHeightSliderChanged(float value)
     {
-        _boardHeightLabel.text = string.Format(_boardHeightValueLabel, value);
-        UpdateOrientationPanel(_gameSettings.BoardWidth, (int)value);
+        _heightSliderValue = (int)value;
+        _boardHeightLabel.text = string.Format(_boardHeightValueLabel, _heightSliderValue);
+        UpdateOrientationPanel();
     }
 
     private void OnApplySettingsClicked()
@@ -233,11 +238,13 @@ public class GameUIManager : MonoBehaviour
         }
 
         NotifySettingsPanelShown?.Invoke();
+        ToggleShowButtonActive(false);
         
         _bodyRectTransform.gameObject.SetActive(true);
         ToggleUIBlockerActive(true);
         ResetSliders();
         SubscribeToSliderEvents();
+        InitializeOrientationPanel();
 
         float startValue = _bodyRect.height;
         float endValue = 0;
@@ -249,7 +256,6 @@ public class GameUIManager : MonoBehaviour
             .SetEase(Ease.OutBounce)
             .OnComplete(() =>
             {
-                ToggleShowButtonActive(false);
                 ToggleUIBlockerActive(false);
             });
             
@@ -263,6 +269,7 @@ public class GameUIManager : MonoBehaviour
             return;
         }
 
+        ToggleShowButtonActive(true);
         UnsubscribeFromSliderEvents();
         
         if (animate)
@@ -279,7 +286,6 @@ public class GameUIManager : MonoBehaviour
                 .OnComplete(()=>
                 {
                     HideWithoutAnimation();
-                    ToggleShowButtonActive(true);
                     ToggleUIBlockerActive(false);
                     NotifySettingsPanelHidden?.Invoke();
                 });
@@ -311,12 +317,14 @@ public class GameUIManager : MonoBehaviour
     //TODO Fix this. On event, I have to update according to slider value, not settings value
     private void InitializeOrientationPanel()
     {
-        UpdateOrientationPanel(_gameSettings.BoardWidth, _gameSettings.BoardHeight);
+        _widthSliderValue = _gameSettings.BoardWidth;
+        _heightSliderValue = _gameSettings.BoardHeight;
+        UpdateOrientationPanel();
     }
 
-    private void UpdateOrientationPanel(int boardWidth, int boardHeight)
+    private void UpdateOrientationPanel()
     {
-        var isForcedLandscape = _gameSettings.ShouldForceLandscape(boardWidth, boardHeight);
+        var isForcedLandscape = _gameSettings.ShouldForceLandscape(_widthSliderValue, _heightSliderValue);
 
         if (isForcedLandscape)
         {
