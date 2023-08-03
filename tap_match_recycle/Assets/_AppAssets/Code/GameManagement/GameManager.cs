@@ -18,6 +18,9 @@ namespace _AppAssets.Code.GameManagement
         private InputManager _inputManager;
         private Matchable _lastTappedMatchable;
 
+        private int _turnCount;
+        private int _score;
+
         private void Awake()
         {
             _currentGameState = GameStates.UNDEFINED;
@@ -28,7 +31,7 @@ namespace _AppAssets.Code.GameManagement
             ChangeGameState(GameStates.INITIALIZE_GAME);
         }
         
-        public void ResetBoard()
+        private void ResetBoard()
         {
             _binsManager.UpdateBinsPanel();
             _boardManager.ClearBoard();
@@ -52,14 +55,21 @@ namespace _AppAssets.Code.GameManagement
                     break;
                 case GameStates.UPDATE_BOARD:
                     _inputManager.ToggleInputBlocked(true);
-                    _boardManager.FindMatchesAndUpdateBoard(_lastTappedMatchable);
+                    var matchesFound = _boardManager.FindMatchesAndUpdateBoard(_lastTappedMatchable);
+                    _score += matchesFound;
                     break;
                 case GameStates.CHECK_GAME_END:
-
+                    _turnCount++;
+                    _gameUIManager.UpdateUI(_turnCount, _score);
                     var endGameStatus = _currentGameMode.CheckEndOfGameStatus();
                     HandleEndOfGame(endGameStatus);
                     break;
                 case GameStates.CONFIGURE_GAME:
+                    _inputManager.ToggleInputBlocked(true);
+                    //TODO Maybe implement BoardManager.HideBoard, so it's not rendered?
+                    break;
+                case GameStates.RESET_GAME:
+                    ResetBoard();
                     break;
             }
         }
@@ -76,16 +86,27 @@ namespace _AppAssets.Code.GameManagement
             _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
             _gameUIManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             
+            ResetScores();
+
             SubscribeToEvents();
             
             ChangeGameState(GameStates.SET_UP_BOARD);
         }
 
+        private void ResetScores()
+        {
+            _turnCount = 1;
+            _score = 0;
+            _gameUIManager.UpdateUI(_turnCount, _score);
+        }
+
         private void SubscribeToEvents()
         {
             _inputManager.OnItemTapped += OnMatchableTapped;
-            _boardManager.OnBoardUpdated += OnBoardUpdated;
-            _gameUIManager.OnGameSettingsChanged += ResetBoard;
+            _boardManager.OnBoardUpdated += () => ChangeGameState(GameStates.CHECK_GAME_END);
+            _gameUIManager.OnGameSettingsChanged += OnGameSettingsChanged;
+            _gameUIManager.NotifySettingsPanelShown += () => ChangeGameState(GameStates.CONFIGURE_GAME);
+            _gameUIManager.NotifySettingsPanelHidden += () => ChangeGameState(GameStates.WAIT_FOR_INPUT);
         }
         
         private IEnumerator SetupGame()
@@ -113,12 +134,12 @@ namespace _AppAssets.Code.GameManagement
             _lastTappedMatchable = tappedMatchable;
             ChangeGameState(GameStates.UPDATE_BOARD);
         }
-        
-        private void OnBoardUpdated()
+
+        public void OnGameSettingsChanged()
         {
-            ChangeGameState(GameStates.CHECK_GAME_END);
+            ChangeGameState(GameStates.RESET_GAME);
         }
-        
+
         private void HandleEndOfGame(EndGameStatus endGameStatus)
         {
             switch (endGameStatus)

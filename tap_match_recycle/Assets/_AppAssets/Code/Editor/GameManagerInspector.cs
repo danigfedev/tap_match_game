@@ -22,7 +22,8 @@ namespace _AppAssets.Code.Editor
             
             if (GUILayout.Button("Reset Board"))
             {
-                gameManager.ResetBoard();
+                gameManager.OnGameSettingsChanged();
+                // gameManager.ResetBoard();
             }
         }
     }

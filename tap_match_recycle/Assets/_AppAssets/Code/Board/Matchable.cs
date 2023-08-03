@@ -35,8 +35,6 @@ namespace _AppAssets.Code
 
         private void Update()
         {
-            //TODO check matchable bounciness
-            //TODO Optimize this to only affect matchables from above
             if (BoardNode != null && transform.localPosition.y >= BoardNode.BoardHeight - 1)
             {
                 var heightDiff = transform.localPosition.y - (BoardNode.BoardHeight - 0.5f);

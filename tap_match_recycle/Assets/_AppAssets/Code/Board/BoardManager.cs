@@ -50,7 +50,7 @@ namespace _AppAssets.Code
             ResetPool();
         }
 
-        public void FindMatchesAndUpdateBoard(Matchable tappedMatchable)
+        public int FindMatchesAndUpdateBoard(Matchable tappedMatchable)
         {
             //Flow:
             // 1 - Find Matches 
@@ -74,6 +74,8 @@ namespace _AppAssets.Code
             _finishedAnimationsCounter = 0;
             
             matchablesToAnimate.Animate(OnAnimationEnded);
+
+            return matches.Count;
         }
 
         private void OnAnimationEnded(Matchable animatedMatchable)

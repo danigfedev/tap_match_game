@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using _AppAssets.Code;
 using _AppAssets.Code.Settings;
 using DG.Tweening;
@@ -10,9 +8,12 @@ using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour
 {
-    [Header("Main Rect Transforms")]
+    [Header("Main UI Elements")]
     [SerializeField] private RectTransform _headerRectTransform;
     [SerializeField] private RectTransform _bodyRectTransform;
+    [SerializeField] private GameObject _uiBlocker;
+    [SerializeField] private float _showAnimationDuration = 0.5f;
+    [SerializeField] private float _hideAnimationDuration = 0.5f;
 
     [Space]
     [Header("HEADER")]
@@ -26,17 +27,20 @@ public class GameUIManager : MonoBehaviour
     [Header("Matchables Variety")] 
     [SerializeField] private TMPro.TextMeshProUGUI _minMatchableVarietyLabel;
     [SerializeField] private TMPro.TextMeshProUGUI _maxMatchableVarietyLabel;
+    [SerializeField] private TMPro.TextMeshProUGUI _matchableVarietyLabel;
     [SerializeField] private Slider _matchableVarietySlider;
     
     [Space] 
     [Header("Board Width")] 
     [SerializeField] private TMPro.TextMeshProUGUI _minBoardWidthLabel;
     [SerializeField] private TMPro.TextMeshProUGUI _maxBoardWidthLabel;
+    [SerializeField] private TMPro.TextMeshProUGUI _boardWidthLabel;
     [SerializeField] private Slider _boardWidthSlider;
     
     [Header("Board Height")] 
     [SerializeField] private TMPro.TextMeshProUGUI _minBoardHeightLabel;
     [SerializeField] private TMPro.TextMeshProUGUI _maxBoardHeightLabel;
+    [SerializeField] private TMPro.TextMeshProUGUI _boardHeightLabel;
     [SerializeField] private Slider _boardHeightSlider;
     
     [Header("Device Orientation")] 
@@ -46,7 +50,9 @@ public class GameUIManager : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button _resetButton;
 
-    public event Action OnGameSettingsChanged; 
+    public event Action NotifySettingsPanelShown;
+    public event Action NotifySettingsPanelHidden;
+    public event Action OnGameSettingsChanged;
     
     private GameSettings _gameSettings;
     private DisplaySettings _displaySettings;
@@ -60,22 +66,32 @@ public class GameUIManager : MonoBehaviour
     private int _minBoardHeight;
     private int _maxBoardHeight;
 
+    private string _matchableVarietyValueLabel;
+    private string _boardWidthValueLabel;
+    private string _boardHeightValueLabel;
+
     public void Initialize(GameSettings gameSettings, DisplaySettings displaySettings)
     {
         _gameSettings = gameSettings;
         _displaySettings = displaySettings;
 
         AdjustDimensions();
-
+        
         InitializeHeader();
+        ToggleUIBlockerActive(false);
         
         SetupBodyAnimations();
-
-        //Initialize UI values with game Settings
+        
         CalculateSettingMinAndMaxValues();
         ConfigureSliders();
         
-        SubscribeToEvents();
+        SubscribeToButtonEvents();
+    }
+
+    public void UpdateUI(int turnCount, int scoreCount)
+    {
+        _turnCountLabel.text = turnCount.ToString();
+        _scoreLabel.text = scoreCount.ToString();
     }
 
     private void InitializeHeader()
@@ -89,10 +105,15 @@ public class GameUIManager : MonoBehaviour
         _hideButton.gameObject.SetActive(!activateShowButton);
     }
 
+    private void ToggleUIBlockerActive(bool activateBlocker)
+    {
+        _uiBlocker.SetActive(activateBlocker);
+    } 
+
     private void SetupBodyAnimations()
     {
          _bodyRect = _bodyRectTransform.rect;
-         Hide(false);
+         HideBody(false);
     }
 
     private void AdjustDimensions()
@@ -120,6 +141,7 @@ public class GameUIManager : MonoBehaviour
         _matchableVarietySlider.minValue = _minMatchableVariety;
         _matchableVarietySlider.maxValue = _maxMatchableVariety;
         _matchableVarietySlider.value = _gameSettings.NumberOfMatchables;
+        _matchableVarietyValueLabel = _matchableVarietyLabel.text;
         
         //Board Width
         _minBoardWidthLabel.text = _minBoardWidth.ToString();
@@ -127,6 +149,7 @@ public class GameUIManager : MonoBehaviour
         _boardWidthSlider.minValue = _minBoardWidth;
         _boardWidthSlider.maxValue = _maxBoardWidth;
         _boardWidthSlider.value = _gameSettings.BoardWidth;
+        _boardWidthValueLabel = _boardWidthLabel.text;
         
         //Board Height
         _minBoardHeightLabel.text = _minBoardHeight.ToString();
@@ -134,86 +157,128 @@ public class GameUIManager : MonoBehaviour
         _boardHeightSlider.minValue = _minBoardHeight;
         _boardHeightSlider.maxValue = _maxBoardHeight;
         _boardHeightSlider.value = _gameSettings.BoardHeight;
+        _boardHeightValueLabel = _boardHeightLabel.text;
+        
+        ResetSliders();
     }
     
-    private void SubscribeToEvents()
+    private void SubscribeToButtonEvents()
     {
-        _resetButton.onClick.AddListener(FireOnGameSettingsChangedEvent);
-        _showButton.onClick.AddListener(Show);
-        _hideButton.onClick.AddListener(() => Hide());
-        
+        _resetButton.onClick.AddListener(OnApplySettingsClicked);
+        _showButton.onClick.AddListener(ShowBody);
+        _hideButton.onClick.AddListener(() => HideBody());
+    }
+
+    private void SubscribeToSliderEvents()
+    {
         _matchableVarietySlider.onValueChanged.AddListener(OnMatchableVarietySliderChanged);
         _boardWidthSlider.onValueChanged.AddListener(OnBoardWidthSliderChanged);
         _boardHeightSlider.onValueChanged.AddListener(OnBoardHeightSliderChanged);
     }
 
+    private void UnsubscribeFromSliderEvents()
+    {
+        _matchableVarietySlider.onValueChanged.RemoveAllListeners();
+        _boardWidthSlider.onValueChanged.RemoveAllListeners();
+        _boardHeightSlider.onValueChanged.RemoveAllListeners();
+    }
+
+    private void ResetSliders()
+    {
+        _matchableVarietyLabel.text = string.Format(_matchableVarietyValueLabel, _gameSettings.NumberOfMatchables);
+        _boardWidthLabel.text = string.Format(_boardWidthValueLabel, _gameSettings.BoardWidth);
+        _boardHeightLabel.text = string.Format(_boardHeightValueLabel, _gameSettings.BoardHeight);
+
+        _matchableVarietySlider.value = _gameSettings.NumberOfMatchables;
+        _boardWidthSlider.value = _gameSettings.BoardWidth;
+        _boardHeightSlider.value = _gameSettings.BoardHeight;
+    }
+
+    private void ApplySettings()
+    {
+        _gameSettings.NumberOfMatchables = (int)_matchableVarietySlider.value;
+        _gameSettings.BoardWidth = (int)_boardWidthSlider.value;
+        _gameSettings.BoardHeight = (int)_boardHeightSlider.value;
+    } 
     private void OnMatchableVarietySliderChanged(float value)
     {
-        _gameSettings.NumberOfMatchables = (int)value;
+        _matchableVarietyLabel.text = string.Format(_matchableVarietyValueLabel, value);
     }
 
     private void OnBoardWidthSliderChanged(float value)
     {
-        _gameSettings.BoardWidth = (int)value;
+        _boardWidthLabel.text = string.Format(_boardWidthValueLabel, value);
     }
 
     private void OnBoardHeightSliderChanged(float value)
     {
-        _gameSettings.BoardHeight = (int)value;
+        _boardHeightLabel.text = string.Format(_boardHeightValueLabel, value);
     }
 
-    private void FireOnGameSettingsChangedEvent()
+    private void OnApplySettingsClicked()
     {
-        Hide();
+        HideBody();
+        ApplySettings();
         OnGameSettingsChanged?.Invoke();
     }
     
-    private void Show()
+    private void ShowBody()
     {
         if (!_bodyHidden)
         {
             return;
         }
+
+        NotifySettingsPanelShown?.Invoke();
         
         _bodyRectTransform.gameObject.SetActive(true);
+        ToggleUIBlockerActive(true);
+        ResetSliders();
+        SubscribeToSliderEvents();
 
-        float startValue = _bodyRect.height;//_bodyRectTransform.anchoredPosition.y;
-        float endValue = 0;//startValue - _bodyRect.height;
-        var duration = 1f;
-        
+        float startValue = _bodyRect.height;
+        float endValue = 0;
+
         DOVirtual.Float(startValue,
                 endValue,
-                duration,
+                _showAnimationDuration,
                 updatedValue => UpdateBodyPosition(updatedValue))
+            .SetEase(Ease.OutBounce)
             .OnComplete(() =>
             {
                 ToggleShowButtonActive(false);
+                ToggleUIBlockerActive(false);
             });
             
             _bodyHidden = false;
     }
 
-    private void Hide(bool animate = true)
+    private void HideBody(bool animate = true)
     {
         if (_bodyHidden)
         {
             return;
         }
 
+        UnsubscribeFromSliderEvents();
+        
         if (animate)
         {
+            ToggleUIBlockerActive(true);
+            
             float startValue = 0;
             float endValue = startValue + _bodyRect.height;
-            var duration = 1f;
 
             DOVirtual.Float(startValue,
                     endValue,
-                    duration,
+                    _hideAnimationDuration,
                     updatedValue => UpdateBodyPosition(updatedValue))
                 .OnComplete(()=>
                 {
                     HideWithoutAnimation();
                     ToggleShowButtonActive(true);
+                    ToggleUIBlockerActive(false);
+                    NotifySettingsPanelHidden?.Invoke();
                 });
         }
         else
@@ -238,48 +303,5 @@ public class GameUIManager : MonoBehaviour
         var xAnchoredPosition = _bodyRectTransform.anchoredPosition.x;
         var newPos = new Vector2(xAnchoredPosition,newHeight);
         _bodyRectTransform.anchoredPosition = newPos;
-    }
-
-    void Start()
-    {
-        Debug.LogWarning($"Start | Anchored Position: {_headerRectTransform.anchoredPosition}");
-
-        Debug.LogWarning($"Start | Size Delta: {_headerRectTransform.sizeDelta}");
-
-        var rect = _headerRectTransform.rect;
-        
-        Debug.LogWarning($"Start | Size Delta: {rect.height}");
-
-        //TODO Down animation:
-        //anchoredPosition.y: rect.height => 0
-        
-        //TODO Up animation:
-        //anchoredPosition.y: 0 => rect.height
-        
-        // Code for animation with DoTween
-        // DOTween.To(() => startValue, x => currentValue = x, endValue, duration)
-        //     .OnUpdate(() => {
-        //         // Este callback se llama en cada frame durante la animación
-        //         // Puedes usar currentValue aquí para hacer algo con el valor actualizado del float
-        //         Debug.Log("Current Value: " + currentValue);
-        //     })
-        //     .OnComplete(() => {
-        //         // Este callback se llama cuando la animación ha terminado
-        //         Debug.Log("Animation completed!");
-        //     });
-        
-        //TODO Implement Show()/Hide()
-        
-        // use bool settingsPanelVisible; Use it in  Show()/Hide() to control whether the animation should be played or not.
-        
-        // _headerRectTransform.anchoredPosition += Vector2.up * rect.height;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Debug.Log($"Update | Anchored Position: {_headerRectTransform.anchoredPosition}");
-
-        Debug.Log($"Update | Size Delta: {_headerRectTransform.sizeDelta}");
     }
 }

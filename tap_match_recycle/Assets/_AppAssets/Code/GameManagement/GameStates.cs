@@ -8,6 +8,7 @@ namespace _AppAssets.Code
         WAIT_FOR_INPUT,
         UPDATE_BOARD,
         CHECK_GAME_END,
-        CONFIGURE_GAME
+        CONFIGURE_GAME,
+        RESET_GAME
     }
 }
