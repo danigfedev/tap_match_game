@@ -20,5 +20,15 @@ namespace _AppAssets.Code
 
             return ((int)rangeAttribute.min, (int)rangeAttribute.max);
         }
+
+        public bool IsForcedLandscape()
+        {
+            return BoardWidth > BoardHeight;
+        }
+
+        public bool ShouldForceLandscape(int width, int height)
+        {
+            return width > height;
+        }
     }
 }

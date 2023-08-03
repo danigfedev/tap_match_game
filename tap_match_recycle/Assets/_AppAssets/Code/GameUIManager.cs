@@ -44,8 +44,8 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private Slider _boardHeightSlider;
     
     [Header("Device Orientation")] 
-    [SerializeField] private Image _portraitOrientationImage;
-    [SerializeField] private Image _landscapeOrientationImage;
+    [SerializeField] private CanvasGroup _portraitOrientationGroup;
+    [SerializeField] private CanvasGroup _landscapeOrientationGroup;
     
     [Header("Buttons")]
     [SerializeField] private Button _resetButton;
@@ -81,7 +81,8 @@ public class GameUIManager : MonoBehaviour
         ToggleUIBlockerActive(false);
         
         SetupBodyAnimations();
-        
+
+        InitializeOrientationPanel();
         CalculateSettingMinAndMaxValues();
         ConfigureSliders();
         
@@ -208,11 +209,13 @@ public class GameUIManager : MonoBehaviour
     private void OnBoardWidthSliderChanged(float value)
     {
         _boardWidthLabel.text = string.Format(_boardWidthValueLabel, value);
+        UpdateOrientationPanel((int)value, _gameSettings.BoardHeight);
     }
 
     private void OnBoardHeightSliderChanged(float value)
     {
         _boardHeightLabel.text = string.Format(_boardHeightValueLabel, value);
+        UpdateOrientationPanel(_gameSettings.BoardWidth, (int)value);
     }
 
     private void OnApplySettingsClicked()
@@ -303,5 +306,27 @@ public class GameUIManager : MonoBehaviour
         var xAnchoredPosition = _bodyRectTransform.anchoredPosition.x;
         var newPos = new Vector2(xAnchoredPosition,newHeight);
         _bodyRectTransform.anchoredPosition = newPos;
+    }
+
+    //TODO Fix this. On event, I have to update according to slider value, not settings value
+    private void InitializeOrientationPanel()
+    {
+        UpdateOrientationPanel(_gameSettings.BoardWidth, _gameSettings.BoardHeight);
+    }
+
+    private void UpdateOrientationPanel(int boardWidth, int boardHeight)
+    {
+        var isForcedLandscape = _gameSettings.ShouldForceLandscape(boardWidth, boardHeight);
+
+        if (isForcedLandscape)
+        {
+            _landscapeOrientationGroup.alpha = 1f;
+            _portraitOrientationGroup.alpha = 0.5f;
+        }
+        else
+        {
+            _landscapeOrientationGroup.alpha = 0.5f;
+            _portraitOrientationGroup.alpha = 1f;
+        }
     }
 }

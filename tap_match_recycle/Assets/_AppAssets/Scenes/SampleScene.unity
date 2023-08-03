@@ -263,8 +263,8 @@ MonoBehaviour:
   _maxBoardHeightLabel: {fileID: 883884344}
   _boardHeightLabel: {fileID: 817720799}
   _boardHeightSlider: {fileID: 883884343}
-  _portraitOrientationImage: {fileID: 496843210}
-  _landscapeOrientationImage: {fileID: 0}
+  _portraitOrientationGroup: {fileID: 1780121075}
+  _landscapeOrientationGroup: {fileID: 1318095602}
   _resetButton: {fileID: 4056253904449278455}
 --- !u!1 &51145937
 GameObject:
@@ -630,17 +630,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 294899552}
   m_CullTransparentMesh: 1
---- !u!114 &496843210 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4092932897379666081, guid: eb9e5d7eed0fe4d87bf37a2226c884a1, type: 3}
-  m_PrefabInstance: {fileID: 5461845047344763208}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -893,11 +882,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3196774219232375257, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
       propertyPath: m_fontSize
-      value: 125
+      value: 130
       objectReference: {fileID: 0}
     - target: {fileID: 3196774219232375257, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
       propertyPath: m_fontSizeBase
-      value: 125
+      value: 130
       objectReference: {fileID: 0}
     - target: {fileID: 3389705453601701161, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
       propertyPath: m_Name
@@ -990,6 +979,10 @@ PrefabInstance:
     - target: {fileID: 6865707031086582422, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7099291242410762983, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2020,6 +2013,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1417646421638236996, guid: 53c3bf5603ce24c0c8e37cb9d1467977, type: 3}
   m_PrefabInstance: {fileID: 1274680380}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &1318095602 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 5979535905835769868, guid: eb9e5d7eed0fe4d87bf37a2226c884a1, type: 3}
+  m_PrefabInstance: {fileID: 5461845047344763208}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1358346442
 GameObject:
   m_ObjectHideFlags: 0
@@ -2459,6 +2457,11 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: 1
   m_LayoutPriority: 1
+--- !u!225 &1780121075 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 1034462335676304817, guid: eb9e5d7eed0fe4d87bf37a2226c884a1, type: 3}
+  m_PrefabInstance: {fileID: 5461845047344763208}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1887016420 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6634277645743951351, guid: 7bd7521fff2ef49cabda386ac9935a22, type: 3}
@@ -2849,6 +2852,10 @@ PrefabInstance:
     - target: {fileID: 1341504254044536216, guid: cdb0d0341f5024b28979d269273331c1, type: 3}
       propertyPath: m_Name
       value: ShowButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1341504254044536216, guid: cdb0d0341f5024b28979d269273331c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1865123733736943199, guid: cdb0d0341f5024b28979d269273331c1, type: 3}
       propertyPath: m_Enabled
@@ -3344,6 +3351,18 @@ PrefabInstance:
     - target: {fileID: 3196774219232375257, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
       propertyPath: m_text
       value: Apply Settings
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196774219232375257, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
+      propertyPath: m_fontSize
+      value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196774219232375257, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
+      propertyPath: m_fontStyle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196774219232375257, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 3389705453601701161, guid: 11f7c58b0ca0f47ec9321982c34528ee, type: 3}
       propertyPath: m_Name
