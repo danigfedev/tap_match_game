@@ -1,9 +1,9 @@
 using System;
+using System.Collections;
 using _AppAssets.Code;
 using _AppAssets.Code.Settings;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour
@@ -14,6 +14,10 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private GameObject _uiBlocker;
     [SerializeField] private float _showAnimationDuration = 0.5f;
     [SerializeField] private float _hideAnimationDuration = 0.5f;
+    
+    [Header("Mobile animation (DOTween not working)")]
+    [SerializeField] private AnimationCurve _showAnimationCurve;
+    [SerializeField] private AnimationCurve _hideAnimationCurve;
 
     [Space]
     [Header("HEADER")]
@@ -57,7 +61,8 @@ public class GameUIManager : MonoBehaviour
     private GameSettings _gameSettings;
     private DisplaySettings _displaySettings;
 
-    private Rect _bodyRect;
+    private CanvasScaler _uiCanvasScaler;
+    private Rect _bodyRect; //This throws wrong values on device => _bodyRect.height = 6.341049E+32
     private bool _bodyHidden = false;
     private int _minMatchableVariety;
     private int _maxMatchableVariety;
@@ -71,13 +76,18 @@ public class GameUIManager : MonoBehaviour
     private string _boardHeightValueLabel;
 
     private int _widthSliderValue; 
-    private int _heightSliderValue; 
+    private int _heightSliderValue;
+    private float _bodyHeight;
+    private float _elapsedTime;
 
     public void Initialize(GameSettings gameSettings, DisplaySettings displaySettings)
     {
         _gameSettings = gameSettings;
         _displaySettings = displaySettings;
-
+        _uiCanvasScaler = GetComponent<CanvasScaler>();
+        _bodyHeight = (_displaySettings.FooterHeightScreenPercentage + _displaySettings.BoardHeightScreenPercentage) *
+                      _uiCanvasScaler.referenceResolution.y;
+        
         AdjustDimensions();
         
         InitializeHeader();
@@ -245,23 +255,15 @@ public class GameUIManager : MonoBehaviour
         ResetSliders();
         SubscribeToSliderEvents();
         InitializeOrientationPanel();
-
-        float startValue = _bodyRect.height;
+        
+        _bodyHidden = false;
+        
+        float startValue = _bodyHeight;
         float endValue = 0;
-
-        DOVirtual.Float(startValue,
-                endValue,
-                _showAnimationDuration,
-                updatedValue => UpdateBodyPosition(updatedValue))
-            .SetEase(Ease.OutBounce)
-            .OnComplete(() =>
-            {
-                ToggleUIBlockerActive(false);
-            });
-            
-            _bodyHidden = false;
+        AnimateScreenPanel(startValue, endValue, _showAnimationDuration, UpdateBodyPosition, OnShowAnimationComplete,
+            _showAnimationCurve, Ease.OutBounce);
     }
-
+    
     private void HideBody(bool animate = true)
     {
         if (_bodyHidden)
@@ -277,18 +279,9 @@ public class GameUIManager : MonoBehaviour
             ToggleUIBlockerActive(true);
             
             float startValue = 0;
-            float endValue = startValue + _bodyRect.height;
-
-            DOVirtual.Float(startValue,
-                    endValue,
-                    _hideAnimationDuration,
-                    updatedValue => UpdateBodyPosition(updatedValue))
-                .OnComplete(()=>
-                {
-                    HideWithoutAnimation();
-                    ToggleUIBlockerActive(false);
-                    NotifySettingsPanelHidden?.Invoke();
-                });
+            float endValue = _bodyHeight;
+            
+            AnimateScreenPanel(startValue, endValue, _hideAnimationDuration, UpdateBodyPosition, OnHideAnimationComplete, _hideAnimationCurve, Ease.OutCubic);
         }
         else
         {
@@ -301,10 +294,76 @@ public class GameUIManager : MonoBehaviour
     private void HideWithoutAnimation()
     {
         var xAnchoredPosition = _bodyRectTransform.anchoredPosition.x;
-        var newPos = new Vector2(xAnchoredPosition,_bodyRect.height);
-        _bodyRectTransform.anchoredPosition += newPos;
+        var newPos = new Vector2(xAnchoredPosition,_bodyHeight);
+        _bodyRectTransform.anchoredPosition = newPos;
             
         _bodyRectTransform.gameObject.SetActive(false);
+    }
+    
+    private void AnimateScreenPanel(float startValue, float endValue, float duration, Action<float> onUpdateCallback, Action onCompletecallback, AnimationCurve curve, Ease doTweenEase)
+    {
+        AnimateDoTween(startValue, endValue, duration, onUpdateCallback, onCompletecallback, doTweenEase);
+        
+        //Tests derived from _bodyRect throwing wrong values on device
+        // if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+        // {
+        //     StartCoroutine(AnimateCoroutine(
+        //         startValue,
+        //         endValue,
+        //         duration,
+        //         curve,
+        //         onUpdateCallback, 
+        //         onCompletecallback));
+        // }
+        // else
+        // {
+        //     AnimateDoTween(startValue, endValue, duration, onUpdateCallback, onCompletecallback, doTweenEase);
+        // }
+    }
+    
+    private void AnimateDoTween(float startValue, float endValue, float duration, Action<float> onUpdateCallback, Action onCompletecallback, Ease ease)
+    {
+        DOVirtual.Float(startValue,
+                endValue,
+                duration,
+                updatedValue => onUpdateCallback?.Invoke(updatedValue))
+            .SetEase(ease)
+            .OnComplete(() => onCompletecallback?.Invoke());
+    }
+    
+    // Implemented because of errors with _bodyRect on device.
+    // Not needed since this didn't fix anything. Leaving it here for the effort it took. 
+    private IEnumerator AnimateCoroutine(float startValue, float endValue, float duration, AnimationCurve curve, Action<float> onUpdateCallback, Action onCompletecallback)
+    {
+        _elapsedTime = 0;
+       
+        while (_elapsedTime <= 1)
+        {
+            var t = curve.Evaluate(_elapsedTime);
+            var newYPosition = Mathf.Lerp(startValue, endValue, t);
+            onUpdateCallback?.Invoke(newYPosition);
+            
+            _elapsedTime += Time.deltaTime / duration;
+            
+            yield return null;
+
+            newYPosition = endValue;
+            onUpdateCallback?.Invoke(newYPosition);
+        }
+
+        onCompletecallback?.Invoke();
+    }
+
+    private void OnShowAnimationComplete()
+    {
+        ToggleUIBlockerActive(false);
+    }
+    
+    private void OnHideAnimationComplete()
+    {
+        HideWithoutAnimation();
+        ToggleUIBlockerActive(false);
+        NotifySettingsPanelHidden?.Invoke();
     }
 
     private void UpdateBodyPosition(float newHeight)
@@ -313,8 +372,7 @@ public class GameUIManager : MonoBehaviour
         var newPos = new Vector2(xAnchoredPosition,newHeight);
         _bodyRectTransform.anchoredPosition = newPos;
     }
-
-    //TODO Fix this. On event, I have to update according to slider value, not settings value
+    
     private void InitializeOrientationPanel()
     {
         _widthSliderValue = _gameSettings.BoardWidth;

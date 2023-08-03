@@ -28,10 +28,9 @@ namespace _AppAssets.Code
                 : ScreenOrientation.Portrait;
 
             var previousScreenOrientation = Screen.orientation; 
-            Screen.orientation = newScreenOrientation; //Takes one frame to update. On next frame the width and height values are updated
-
-            // if (isGameInitialization)//Not only initializing, but when changing the amount of elements
-            if (previousScreenOrientation == newScreenOrientation)//Not only initializing, but when changing the amount of elements
+            Screen.orientation = newScreenOrientation; //Orientation change may take several frames
+            
+            if (previousScreenOrientation == newScreenOrientation)
             {
                 yield break;
             }
@@ -39,12 +38,8 @@ namespace _AppAssets.Code
             var initialScreenWidth = Screen.width;
             while (Screen.height != initialScreenWidth)
             {
-                // Debug.Log($"W: {Screen.width}, H: {Screen.height}");
-                
                 yield return null;
             }
-            
-            // Debug.Log($"Orientation changed: W: {Screen.width}, H: {Screen.height}");
         }
         
         public void ConfigureCameraOrtographicSize()
