@@ -30,13 +30,6 @@ namespace _AppAssets.Code.GameManagement
         {
             ChangeGameState(GameStates.INITIALIZE_GAME);
         }
-        
-        private void ResetBoard()
-        {
-            _binsManager.UpdateBinsPanel();
-            _boardManager.ClearBoard();
-            StartCoroutine(SetupGame());
-        }
 
         private void ChangeGameState(GameStates newState)
         {
@@ -94,6 +87,13 @@ namespace _AppAssets.Code.GameManagement
             ChangeGameState(GameStates.SET_UP_BOARD);
         }
 
+        private void ResetBoard()
+        {
+            _binsManager.UpdateBinsPanel();
+            _boardManager.ClearBoard();
+            StartCoroutine(SetupGame());
+        }
+        
         private void ResetScores()
         {
             _turnCount = 1;
