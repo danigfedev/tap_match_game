@@ -24,7 +24,6 @@ namespace _AppAssets.Code
         [SerializeField] private Ease _fallingAnimationEase = Ease.OutBounce;
         [SerializeField] private float _toBinAnimationDuration = 0.5f;
         [SerializeField] private Ease _toBinAnimationEase = Ease.Linear;
-        // [SerializeField] private AnimationCurve _toBinAnimationEase;
 
         public BoardNode BoardNode { get; private set; }
         public bool IsMatched { get; private set; }

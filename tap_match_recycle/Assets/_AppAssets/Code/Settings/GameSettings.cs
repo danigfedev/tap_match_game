@@ -12,5 +12,13 @@ namespace _AppAssets.Code
         [Range(3, 6)] 
         public int NumberOfMatchables = 3;
         public BoardCoordinates BoardDimensions => new BoardCoordinates(BoardWidth, BoardHeight);
+        
+        public (int, int) GetRangeAttributeLimits(string fieldName)
+        {
+            var fieldInfo = typeof(GameSettings).GetField(fieldName);
+            var rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true)[0] as RangeAttribute;
+
+            return ((int)rangeAttribute.min, (int)rangeAttribute.max);
+        }
     }
 }

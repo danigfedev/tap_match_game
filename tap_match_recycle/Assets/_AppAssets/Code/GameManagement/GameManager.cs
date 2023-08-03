@@ -10,6 +10,7 @@ namespace _AppAssets.Code.GameManagement
         [SerializeField] private GameSettingsProvider _gameSettingsProvider;
         [SerializeField] private RecyclingBinsManager _binsManager;
         [SerializeField] private BoardManager _boardManager;
+        [SerializeField] private GameUIManager _gameUIManager;
 
         private GameMode _currentGameMode;
         private GameStates _currentGameState;
@@ -73,7 +74,8 @@ namespace _AppAssets.Code.GameManagement
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
             _binsManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
-
+            _gameUIManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
+            
             SubscribeToEvents();
             
             ChangeGameState(GameStates.SET_UP_BOARD);
@@ -83,6 +85,7 @@ namespace _AppAssets.Code.GameManagement
         {
             _inputManager.OnItemTapped += OnMatchableTapped;
             _boardManager.OnBoardUpdated += OnBoardUpdated;
+            _gameUIManager.OnGameSettingsChanged += ResetBoard;
         }
         
         private IEnumerator SetupGame()
