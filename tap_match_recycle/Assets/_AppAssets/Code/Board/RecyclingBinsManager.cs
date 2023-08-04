@@ -7,6 +7,7 @@ namespace _AppAssets.Code
     public class RecyclingBinsManager : MonoBehaviour
     {
         [SerializeField] private RecyclingBinProvider _binsProvider;
+        [SerializeField] private Canvas _canvas;
         [SerializeField] private GameObject _binCointainer;
 
         private GameSettings _gameSettings;
@@ -15,12 +16,14 @@ namespace _AppAssets.Code
         private Dictionary<RecyclingTypes, GameObject> _typeToBinInstanceMap;
         
         [ContextMenu("Initialize")]
-        public void Initialize(GameSettings gameSettings, DisplaySettings displaySettings)
+        public void Initialize(GameSettings gameSettings, DisplaySettings displaySettings, Camera mainCamera)
         {
             _gameSettings = gameSettings;
             _displaySettings = displaySettings;
             _rectTransform = _binCointainer.GetComponent<RectTransform>();
 
+            _canvas.worldCamera = mainCamera;
+            
             AdjustDimensions();
             
             _typeToBinInstanceMap = _binsProvider.InstantiateAllBins(_binCointainer.transform);

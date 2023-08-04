@@ -15,7 +15,8 @@ namespace _AppAssets.Code.GameManagement
         private BoardManager _boardManagerInstance;
         private RecyclingBinsManager _binsManagerInstance;
         private GameUIManager _gameUIManagerInstance;
-        
+
+        private Camera _mainCamera;
         private GameMode _currentGameMode;
         private GameStates _currentGameState;
         private DisplayManager _displayManager;
@@ -29,6 +30,7 @@ namespace _AppAssets.Code.GameManagement
         {
             _currentGameState = GameStates.UNDEFINED;
             AdjustFrameRate();
+            _mainCamera = Camera.main;
         }
         
         private void Start()
@@ -89,14 +91,14 @@ namespace _AppAssets.Code.GameManagement
             _inputManager = InputFactory.CreateInputManager(gameObject, Application.platform);
             _inputManager.Initialize();
             
-            _displayManager = new DisplayManager(Camera.main);
+            _displayManager = new DisplayManager(_mainCamera);
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
             
             _boardManagerInstance = Instantiate(_boardManagerPrefab);
             _binsManagerInstance = Instantiate(_binsManagerPrefab);
             _gameUIManagerInstance = Instantiate(_gameUIManagerPrefab);
             
-            _binsManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
+            _binsManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings, _mainCamera);
             _boardManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManagerInstance);
             _gameUIManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             

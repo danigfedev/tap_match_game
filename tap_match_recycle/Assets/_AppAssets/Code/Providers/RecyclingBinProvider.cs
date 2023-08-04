@@ -34,7 +34,7 @@ namespace _AppAssets.Code
         {
             var recyclingData = RecyclingDataProvider.GetRecyclingData(type);
             var binInstance = Instantiate(BinPrefab, parent);
-            
+            binInstance.name = $"Bin_{type}";
             binInstance.GetComponent<Bin>().Initialize(recyclingData);
             
             return binInstance;

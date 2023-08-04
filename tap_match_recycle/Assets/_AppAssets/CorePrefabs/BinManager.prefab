@@ -137,7 +137,7 @@ RectTransform:
   m_Children:
   - {fileID: 4162801631314506035}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -220,4 +220,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _binsProvider: {fileID: 11400000, guid: a33e2d96efd6d464ab04035349c6f8ce, type: 2}
+  _canvas: {fileID: 7413924671388969336}
   _binCointainer: {fileID: 4187307560518387864}
