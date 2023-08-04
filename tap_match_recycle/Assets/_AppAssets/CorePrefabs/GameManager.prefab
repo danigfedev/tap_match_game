@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8712572311045912117
 MonoBehaviour:
@@ -47,4 +47,4 @@ MonoBehaviour:
   _gameSettingsProvider: {fileID: 11400000, guid: d7b7626e452e84446b198ed273ee9e08, type: 2}
   _boardManagerPrefab: {fileID: 996810186701605375, guid: 11c7c71b81dc344c1b92ab4afe97806a, type: 3}
   _binsManagerPrefab: {fileID: 559121251052391985, guid: 27942478e89724072bcc77e46179e73d, type: 3}
-  _gameUIManagerPrefab: {fileID: 7287373352048301786, guid: 6c24325ec5ae043a18883f1ee0a2a059, type: 3}
+  _gameUIManagerPrefab: {fileID: 1671832299795659047, guid: 6c24325ec5ae043a18883f1ee0a2a059, type: 3}

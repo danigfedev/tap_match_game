@@ -1,13 +1,11 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EG.EndlessShapes.UI
 {
-    [RequireComponent(typeof(Button))]
-    public class ButtonAnimation : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public class AnimatedButton : Button, IPointerDownHandler, IPointerUpHandler
     {
         private enum AnimationDirections
         {
@@ -20,7 +18,6 @@ namespace EG.EndlessShapes.UI
         [SerializeField] private float _animationSpeed = 2f;
 
         private float _initialScale;
-        private Button _button;
         private bool _isDirty;
         private Coroutine _animationCoroutine;
         private float _elapsedTime = 0;
@@ -31,14 +28,9 @@ namespace EG.EndlessShapes.UI
             {
                 _animationTarget = transform;
             }
-
-            _initialScale = _animationTarget.localScale.x; //Buttons should be scaled equally in every axis
-
-            _button = GetComponent<Button>();
+            _initialScale = _animationTarget.localScale.x;
         }
-
-
-        // Reset behaviour on click
+        
         public void OnDisable()
         {
             if (!_isDirty)
@@ -56,11 +48,10 @@ namespace EG.EndlessShapes.UI
             
             _isDirty = false;
         }
-
-
+        
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (_button.interactable)
+            if (this.interactable)
             {
                 PlayAnimation(AnimationDirections.ScaleDown);
             }
@@ -68,7 +59,7 @@ namespace EG.EndlessShapes.UI
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (_button.interactable)
+            if (this.interactable)
             {
                 PlayAnimation(AnimationDirections.ScaleUp);
             }
