@@ -35,7 +35,10 @@ namespace _AppAssets.Code
 
         private void Update()
         {
-            if (BoardNode != null && transform.localPosition.y >= BoardNode.BoardHeight - 1)
+            //(transform.localPosition.y >= BoardNode.BoardHeight - 1): This check fails some times, and the items is translucent in board.
+            //It's nto frequent. Not cool either, so keeping it like this for now
+            // if (BoardNode != null && transform.localPosition.y >= BoardNode.BoardHeight - 1)
+            if (BoardNode != null)
             {
                 var heightDiff = transform.localPosition.y - (BoardNode.BoardHeight - 0.5f);
                 var color = _spriteRenderer.color;
