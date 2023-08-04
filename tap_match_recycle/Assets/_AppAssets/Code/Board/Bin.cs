@@ -11,7 +11,9 @@ namespace _AppAssets.Code
         public void Initialize(RecyclingData recyclingData)
         {            
             _binImage.color *= recyclingData.RecyclingTypeColor;
-            _matchableImage.sprite = recyclingData.Sprite;
+            //Idea: place matchable sprite. => Not adjusting to all resolutions correctly. Sticking to
+            //recycling symbol for now
+            // _matchableImage.sprite = recyclingData.Sprite;
         }
     }
 }
