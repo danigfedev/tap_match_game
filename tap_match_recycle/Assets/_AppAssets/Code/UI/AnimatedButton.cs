@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace EG.EndlessShapes.UI
 {
-    public class AnimatedButton : Button, IPointerDownHandler, IPointerUpHandler
+    public class AnimatedButton : Button
     {
         private enum AnimationDirections
         {
@@ -22,16 +22,18 @@ namespace EG.EndlessShapes.UI
         private Coroutine _animationCoroutine;
         private float _elapsedTime = 0;
 
-        private void Awake()
+        protected override void Awake()
         {
             if(_animationTarget == null)
             {
                 _animationTarget = transform;
             }
             _initialScale = _animationTarget.localScale.x;
+
+            base.Awake();
         }
         
-        public void OnDisable()
+        protected override void OnDisable()
         {
             if (!_isDirty)
             {
@@ -47,22 +49,28 @@ namespace EG.EndlessShapes.UI
             _animationTarget.localScale = _initialScale * Vector3.one;
             
             _isDirty = false;
+            
+            base.OnDisable();
         }
         
-        public void OnPointerDown(PointerEventData eventData)
+        public override void OnPointerDown(PointerEventData eventData)
         {
             if (this.interactable)
             {
                 PlayAnimation(AnimationDirections.ScaleDown);
             }
+
+            base.OnPointerDown(eventData);
         }
 
-        public void OnPointerUp(PointerEventData eventData)
+        public override void OnPointerUp(PointerEventData eventData)
         {
             if (this.interactable)
             {
                 PlayAnimation(AnimationDirections.ScaleUp);
             }
+            
+            base.OnPointerUp(eventData);
         }
 
         private void PlayAnimation(AnimationDirections direction)
