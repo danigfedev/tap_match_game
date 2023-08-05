@@ -119,7 +119,7 @@ public class GameUIManager : MonoBehaviour
         _hideButton.gameObject.SetActive(!activateShowButton);
     }
 
-    private void ToggleUIBlockerActive(bool activateBlocker)
+    public void ToggleUIBlockerActive(bool activateBlocker)
     {
         _uiBlocker.SetActive(activateBlocker);
     } 

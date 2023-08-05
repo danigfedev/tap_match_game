@@ -12,9 +12,9 @@ namespace _AppAssets.Code.GameManagement
         [SerializeField] private RecyclingBinsManager _binsManagerPrefab;
         [SerializeField] private GameUIManager _gameUIManagerPrefab;
 
-        private BoardManager _boardManagerInstance;
-        private RecyclingBinsManager _binsManagerInstance;
-        private GameUIManager _gameUIManagerInstance;
+        private BoardManager _boardManager;
+        private RecyclingBinsManager _binsManager;
+        private GameUIManager _gameUIManager;
 
         private Camera _mainCamera;
         private GameMode _currentGameMode;
@@ -52,15 +52,17 @@ namespace _AppAssets.Code.GameManagement
                     break;
                 case GameStates.WAIT_FOR_INPUT:
                     _inputManager.ToggleInputBlocked(false);
+                    _gameUIManager.ToggleUIBlockerActive(false);
                     break;
                 case GameStates.UPDATE_BOARD:
                     _inputManager.ToggleInputBlocked(true);
-                    var matchesFound = _boardManagerInstance.FindMatchesAndUpdateBoard(_lastTappedMatchable);
+                    _gameUIManager.ToggleUIBlockerActive(true);
+                    var matchesFound = _boardManager.FindMatchesAndUpdateBoard(_lastTappedMatchable);
                     _score += matchesFound;
                     break;
                 case GameStates.CHECK_GAME_END:
                     _turnCount++;
-                    _gameUIManagerInstance.UpdateUI(_turnCount, _score);
+                    _gameUIManager.UpdateUI(_turnCount, _score);
                     var endGameStatus = _currentGameMode.CheckEndOfGameStatus();
                     HandleEndOfGame(endGameStatus);
                     break;
@@ -94,13 +96,13 @@ namespace _AppAssets.Code.GameManagement
             _displayManager = new DisplayManager(_mainCamera);
             _displayManager.Initialize(_gameSettingsProvider.DisplaySettings, _gameSettingsProvider.GameSettings);
             
-            _boardManagerInstance = Instantiate(_boardManagerPrefab);
-            _binsManagerInstance = Instantiate(_binsManagerPrefab);
-            _gameUIManagerInstance = Instantiate(_gameUIManagerPrefab);
+            _boardManager = Instantiate(_boardManagerPrefab);
+            _binsManager = Instantiate(_binsManagerPrefab);
+            _gameUIManager = Instantiate(_gameUIManagerPrefab);
             
-            _binsManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings, _mainCamera);
-            _boardManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManagerInstance);
-            _gameUIManagerInstance.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
+            _binsManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings, _mainCamera);
+            _boardManager.Initialize(_gameSettingsProvider.GameSettings, _displayManager, _binsManager);
+            _gameUIManager.Initialize(_gameSettingsProvider.GameSettings, _gameSettingsProvider.DisplaySettings);
             
             ResetScores();
             SubscribeToEvents();
@@ -110,8 +112,8 @@ namespace _AppAssets.Code.GameManagement
 
         private void ResetBoard()
         {
-            _binsManagerInstance.UpdateBinsPanel();
-            _boardManagerInstance.ClearBoard();
+            _binsManager.UpdateBinsPanel();
+            _boardManager.ClearBoard();
             StartCoroutine(SetupGame());
         }
         
@@ -119,16 +121,16 @@ namespace _AppAssets.Code.GameManagement
         {
             _turnCount = 1;
             _score = 0;
-            _gameUIManagerInstance.UpdateUI(_turnCount, _score);
+            _gameUIManager.UpdateUI(_turnCount, _score);
         }
 
         private void SubscribeToEvents()
         {
             _inputManager.OnItemTapped += OnMatchableTapped;
-            _boardManagerInstance.OnBoardUpdated += () => ChangeGameState(GameStates.CHECK_GAME_END);
-            _gameUIManagerInstance.OnGameSettingsChanged += OnGameSettingsChanged;
-            _gameUIManagerInstance.NotifySettingsPanelShown += () => ChangeGameState(GameStates.CONFIGURE_GAME);
-            _gameUIManagerInstance.NotifySettingsPanelHidden += () => ChangeGameState(GameStates.WAIT_FOR_INPUT);
+            _boardManager.OnBoardUpdated += () => ChangeGameState(GameStates.CHECK_GAME_END);
+            _gameUIManager.OnGameSettingsChanged += OnGameSettingsChanged;
+            _gameUIManager.NotifySettingsPanelShown += () => ChangeGameState(GameStates.CONFIGURE_GAME);
+            _gameUIManager.NotifySettingsPanelHidden += () => ChangeGameState(GameStates.WAIT_FOR_INPUT);
         }
         
         private IEnumerator SetupGame()
@@ -139,7 +141,7 @@ namespace _AppAssets.Code.GameManagement
             
             _displayManager.ConfigureCameraOrtographicSize();
 
-            _boardManagerInstance.BuildGameBoard();
+            _boardManager.BuildGameBoard();
             
             ChangeGameState(GameStates.WAIT_FOR_INPUT);
         }
